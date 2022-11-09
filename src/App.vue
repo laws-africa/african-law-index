@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import HelloWorld from "./components/HelloWorld.vue";
 import TheWelcome from "./components/TheWelcome.vue";
+import FetchData from "./components/FetchData.vue";
 </script>
 
 <template>
@@ -20,6 +21,7 @@ import TheWelcome from "./components/TheWelcome.vue";
 
   <main>
     <TheWelcome />
+    <FetchData />
   </main>
 </template>
 
