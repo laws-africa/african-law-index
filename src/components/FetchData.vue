@@ -1,5 +1,19 @@
 <template>
-  <div></div>
+  <div>
+    <!-- <table>
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Place</th>
+          <th>Legislation</th>
+          <th>Case Law</th>
+          <th>Gazettes</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table> -->
+  </div>
 </template>
 
 <script lang="ts">
@@ -21,7 +35,8 @@ export default {
 
       if (response.ok) {
         let json = this.convertToJson(await response.text());
-        console.log(json);
+        const lawData = this.getPointsPerCountry(json);
+        console.log(json, lawData);
         this.lawIndex = json;
       } else {
         console.log("HTTP-Error: " + response.status);
@@ -36,6 +51,31 @@ export default {
         return obj;
       });
       return output;
+    },
+    findObject(arr: any[], value: any, country: string | number) {
+      const foundArr = arr.find((obj) => obj.Criterion === value);
+      if (foundArr) return foundArr[country];
+      return "";
+    },
+    getPointsPerCountry(arr: any[]) {
+      const firstObj = arr[0];
+      const formattedArray = Object.keys(firstObj).filter(
+        (key) =>
+          key !== "Cat" &&
+          key !== "Criterion" &&
+          key !== "Comments" &&
+          key !== "points"
+      );
+      const newArray = formattedArray.map((country) => {
+        const newObj = {
+          location: country,
+          legislation: this.findObject(arr, "Legislation", country),
+          caseLaw: this.findObject(arr, "Case law", country),
+          gazette: this.findObject(arr, "Gazettes", country),
+        };
+        return newObj;
+      });
+      return newArray;
     },
   },
 };
