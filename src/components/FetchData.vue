@@ -37,7 +37,7 @@ export default {
         let json = this.convertToJson(await response.text());
         const lawData = this.getPointsPerCountry(json);
         console.log(json, lawData);
-        this.lawIndex = json;
+        this.lawIndex = lawData;
       } else {
         console.log("HTTP-Error: " + response.status);
       }
@@ -53,7 +53,7 @@ export default {
       return output;
     },
     findObject(arr: any[], value: any, country: string | number) {
-      const foundArr = arr.find((obj) => obj.Criterion === value);
+      const foundArr = arr.find((obj) => obj.Cat == value);
       if (foundArr) return foundArr[country];
       return "";
     },
@@ -69,13 +69,39 @@ export default {
       const newArray = formattedArray.map((country) => {
         const newObj = {
           location: country,
-          legislation: this.findObject(arr, "Legislation", country),
-          caseLaw: this.findObject(arr, "Case law", country),
-          gazette: this.findObject(arr, "Gazettes", country),
+          legislation: this.sortAccordionData(arr, "1.", country),
+          caseLaw: this.sortAccordionData(arr, "2.", country),
+          gazette: this.sortAccordionData(arr, "3.", country),
         };
         return newObj;
       });
       return newArray;
+    },
+    sortAccordionData(arr: any[], filterValue: string, country: string) {
+      const objToReturn: { [key: string]: any } = {};
+      const childrenArray = arr
+        .filter((el, index) => {
+          if (
+            el.Cat.startsWith(filterValue) &&
+            arr[index - 1].Cat === "Website"
+          ) {
+            objToReturn.website = arr[index - 1][country];
+          }
+          return el.Cat.startsWith(filterValue);
+        })
+        .map((obj) => {
+          const newObj = {
+            cat: obj.Cat,
+            criterion: obj.Criterion,
+            comments: obj.Comments,
+            score: obj[country],
+          };
+          return newObj;
+        });
+      objToReturn.childrenArray = childrenArray;
+      objToReturn.total = this.findObject(arr, parseInt(filterValue), country);
+
+      return objToReturn;
     },
   },
 };
