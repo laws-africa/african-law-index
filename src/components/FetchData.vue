@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <table>
+    <table>
       <thead>
         <tr>
           <th>Rank</th>
@@ -11,8 +11,26 @@
           <th>Score</th>
         </tr>
       </thead>
-      <tbody></tbody>
-    </table> -->
+      <tbody>
+        <tr v-for="(access, access_index) in lawIndex" :key="access_index">
+          <td>{{ access_index + 1 }}</td>
+          <td>{{ access.location }}</td>
+          <td>{{ Math.floor((access.legislation.total * 100) / 70) }}%</td>
+          <td>{{ Math.floor((access.caseLaw.total * 100) / 60) }}%</td>
+          <td>{{ Math.floor((access.gazette.total * 100) / 60) }}%</td>
+          <td>
+            {{
+              Math.floor(
+                (access.legislation.total * 100 +
+                  access.caseLaw.total * 100 +
+                  access.gazette.total * 100) /
+                  190
+              )
+            }}%
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
