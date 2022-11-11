@@ -12,7 +12,7 @@
         </tr>
       </thead>
       <tbody v-for="(access, access_index) in lawIndex" :key="access_index">
-        <tr>
+        <tr @click="toggleAccordion">
           <td>{{ access_index + 1 }}</td>
           <td>{{ access.location }}</td>
           <td>{{ Math.floor((access.legislation.total * 100) / 70) }}%</td>
@@ -21,10 +21,9 @@
           <td>{{ access.score }}%</td>
         </tr>
 
-        <tr class="accordion">
+        <tr class="accordion-body">
           <td></td>
           <td colspan="5">
-            <!-- <div class="accordion-body">Say hello</div> -->
             <div>
               <p>{{ access.location }}</p>
               <table>
@@ -170,6 +169,15 @@ export default {
         this.lawIndex.sort((a, b) => a[field] - b[field]);
       else this.lawIndex.sort((a, b) => a[field].total - b[field].total);
     },
+    toggleAccordion(e: any) {
+      const accordionBody = e.target.parentElement.nextElementSibling;
+
+      if (accordionBody.style.display === "none") {
+        accordionBody.style.display = "table-row";
+      } else {
+        accordionBody.style.display = "none";
+      }
+    },
   },
 };
 </script>
@@ -192,16 +200,7 @@ thead th {
   width: 25%;
 }
 
-/* .accordion {
-  column-fill: auto;
-  column-span: all;
-  empty-cells: hide;
-} */
-
-/* .accordion-body {
-  padding: 0 18px;
-  background-color: white;
+.accordion-body {
   display: none;
-  overflow: hidden;
-} */
+}
 </style>
