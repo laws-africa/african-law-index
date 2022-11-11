@@ -4,11 +4,11 @@
       <thead>
         <tr>
           <th>Rank</th>
-          <th>Place</th>
-          <th>Legislation</th>
-          <th>Case Law</th>
-          <th>Gazettes</th>
-          <th>Score</th>
+          <th @click="sortByColumn('location')">Place</th>
+          <th @click="sortByColumn('legislation')">Legislation</th>
+          <th @click="sortByColumn('caseLaw')">Case Law</th>
+          <th @click="sortByColumn('gazette')">Gazettes</th>
+          <th @click="sortByColumn('score')">Score</th>
         </tr>
       </thead>
       <tbody>
@@ -18,16 +18,7 @@
           <td>{{ Math.floor((access.legislation.total * 100) / 70) }}%</td>
           <td>{{ Math.floor((access.caseLaw.total * 100) / 60) }}%</td>
           <td>{{ Math.floor((access.gazette.total * 100) / 60) }}%</td>
-          <td>
-            {{
-              Math.floor(
-                (access.legislation.total * 100 +
-                  access.caseLaw.total * 100 +
-                  access.gazette.total * 100) /
-                  190
-              )
-            }}%
-          </td>
+          <td>{{ access.score }}%</td>
         </tr>
       </tbody>
     </table>
@@ -54,7 +45,7 @@ export default {
       if (response.ok) {
         let json = this.convertToJson(await response.text());
         const lawData = this.getPointsPerCountry(json);
-        console.log(json, lawData);
+        console.log(lawData);
         this.lawIndex = lawData;
       } else {
         console.log("HTTP-Error: " + response.status);
@@ -85,12 +76,18 @@ export default {
           key !== "points"
       );
       const newArray = formattedArray.map((country) => {
-        const newObj = {
+        const newObj: { [key: string]: any } = {
           location: country,
           legislation: this.sortAccordionData(arr, "1.", country),
           caseLaw: this.sortAccordionData(arr, "2.", country),
           gazette: this.sortAccordionData(arr, "3.", country),
         };
+        newObj.score = Math.floor(
+          (newObj.legislation.total * 100 +
+            newObj.caseLaw.total * 100 +
+            newObj.gazette.total * 100) /
+            190
+        );
         return newObj;
       });
       return newArray;
@@ -120,6 +117,23 @@ export default {
       objToReturn.total = this.findObject(arr, parseInt(filterValue), country);
 
       return objToReturn;
+    },
+    sortByColumn(field: string) {
+      if (field === "location")
+        this.lawIndex.sort((a, b) => {
+          const locationA = a.location.toLowerCase();
+          const locationB = b.location.toLowerCase();
+          if (locationA < locationB) {
+            return -1;
+          }
+          if (locationA > locationB) {
+            return 1;
+          }
+          return 0;
+        });
+      else if (field === "score")
+        this.lawIndex.sort((a, b) => a[field] - b[field]);
+      else this.lawIndex.sort((a, b) => a[field].total - b[field].total);
     },
   },
 };
