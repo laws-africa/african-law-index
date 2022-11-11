@@ -11,14 +11,49 @@
           <th @click="sortByColumn('score')">Score</th>
         </tr>
       </thead>
-      <tbody>
-        <tr v-for="(access, access_index) in lawIndex" :key="access_index">
+      <tbody v-for="(access, access_index) in lawIndex" :key="access_index">
+        <tr>
           <td>{{ access_index + 1 }}</td>
           <td>{{ access.location }}</td>
           <td>{{ Math.floor((access.legislation.total * 100) / 70) }}%</td>
           <td>{{ Math.floor((access.caseLaw.total * 100) / 60) }}%</td>
           <td>{{ Math.floor((access.gazette.total * 100) / 60) }}%</td>
           <td>{{ access.score }}%</td>
+        </tr>
+
+        <tr class="accordion">
+          <td></td>
+          <td colspan="5">
+            <!-- <div class="accordion-body">Say hello</div> -->
+            <div>
+              <p>{{ access.location }}</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Legislation</th>
+                    <th>{{ access.legislation.website }}</th>
+                    <th>Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(legislation, legislation_index) in access
+                      .legislation.childrenArray"
+                    :key="legislation_index"
+                  >
+                    <td>{{ legislation.cat }} {{ legislation.criterion }}</td>
+                    <td>{{ legislation.comments }}</td>
+                    <td>{{ legislation.score }}</td>
+                  </tr>
+                  <tr>
+                    <td>TOTAL</td>
+                    <td></td>
+                    <td>{{ access.legislation.total }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -138,3 +173,35 @@ export default {
   },
 };
 </script>
+
+<style>
+table {
+  border-collapse: collapse;
+  border: 1px solid black;
+  text-align: center;
+  vertical-align: middle;
+}
+
+th,
+td {
+  border: 1px solid black;
+  padding: 8px;
+}
+
+thead th {
+  width: 25%;
+}
+
+/* .accordion {
+  column-fill: auto;
+  column-span: all;
+  empty-cells: hide;
+} */
+
+/* .accordion-body {
+  padding: 0 18px;
+  background-color: white;
+  display: none;
+  overflow: hidden;
+} */
+</style>
