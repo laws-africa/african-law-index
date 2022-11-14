@@ -134,7 +134,6 @@ const africanLawIndex = createApp({
       if (response.ok) {
         let json = this.convertToJson(await response.text());
         const lawData = this.formatLawIndex(json);
-        console.log(lawData);
         this.lawIndex = lawData;
       } else {
         console.log("HTTP-Error: " + response.status);
@@ -152,7 +151,7 @@ const africanLawIndex = createApp({
     },
     findDataPerCountry(arr, value, country) {
       const foundArr = arr.find((obj) => obj.Cat == value);
-      if (foundArr) return foundArr[country];
+      if (foundArr[country]) return foundArr[country];
       return "";
     },
     formatLawIndex(arr) {
@@ -205,6 +204,10 @@ const africanLawIndex = createApp({
       objToReturn.total = parseInt(
         this.findDataPerCountry(arr, parseInt(filterValue), country)
       );
+      objToReturn.points = parseInt(
+        this.findDataPerCountry(arr, parseInt(filterValue), "points")
+      );
+      objToReturn.comments = this.findDataPerCountry(arr, parseInt(filterValue), "Comments");
 
       return objToReturn;
     },
@@ -225,15 +228,6 @@ const africanLawIndex = createApp({
         this.lawIndex.sort((a, b) => a[field] - b[field]);
       else this.lawIndex.sort((a, b) => a[field].total - b[field].total);
     },
-    // toggleAccordion(e) {
-    //   const accordionBody = e.target.parentElement.nextElementSibling;
-
-    //   if (accordionBody.style.display === "none") {
-    //     accordionBody.style.display = "table-row";
-    //   } else {
-    //     accordionBody.style.display = "none";
-    //   }
-    // },
   },
 });
 
