@@ -18,7 +18,7 @@
           <td>{{ Math.floor((access.legislation.total * 100) / 70) }}%</td>
           <td>{{ Math.floor((access.caseLaw.total * 100) / 60) }}%</td>
           <td>{{ Math.floor((access.gazette.total * 100) / 60) }}%</td>
-          <td>{{ access.score }}%</td>
+          <td>{{ Math.floor(access.score) }}%</td>
         </tr>
 
         <tr class="accordion-body">
@@ -51,6 +51,58 @@
                   </tr>
                 </tbody>
               </table>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Case Law</th>
+                    <th>{{ access.caseLaw.website }}</th>
+                    <th>Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(caseLaw, caseLaw_index) in access.caseLaw
+                      .childrenArray"
+                    :key="caseLaw_index"
+                  >
+                    <td>{{ caseLaw.cat }} {{ caseLaw.criterion }}</td>
+                    <td>{{ caseLaw.comments }}</td>
+                    <td>{{ caseLaw.score }}</td>
+                  </tr>
+                  <tr>
+                    <td>TOTAL</td>
+                    <td></td>
+                    <td>{{ access.caseLaw.total }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Gazettes</th>
+                    <th>{{ access.gazette.website }}</th>
+                    <th>Points</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(gazette, gazette_index) in access.gazette
+                      .childrenArray"
+                    :key="gazette_index"
+                  >
+                    <td>{{ gazette.cat }} {{ gazette.criterion }}</td>
+                    <td>{{ gazette.comments }}</td>
+                    <td>{{ gazette.score }}</td>
+                  </tr>
+                  <tr>
+                    <td>TOTAL</td>
+                    <td></td>
+                    <td>{{ access.gazette.total }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </td>
         </tr>
@@ -68,17 +120,17 @@ export default {
     };
   },
   mounted() {
-    this.fetchIndex();
+    this.fetchLawIndex();
   },
   methods: {
-    async fetchIndex() {
+    async fetchLawIndex() {
       let response = await fetch(
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vToqs8Oyz-t2FyHSHAmoqBvFiaR90j2L0XRysS_Wc7IaK6ZVdEhWRDo_jFJNdLqS-1W-OS00UxmLsCg/pub?gid=1585265851&single=true&output=csv"
       );
 
       if (response.ok) {
         let json = this.convertToJson(await response.text());
-        const lawData = this.getPointsPerCountry(json);
+        const lawData = this.formatLawIndex(json);
         console.log(lawData);
         this.lawIndex = lawData;
       } else {
@@ -95,14 +147,13 @@ export default {
       });
       return output;
     },
-    findObject(arr: any[], value: any, country: string | number) {
+    findDataPerCountry(arr: any[], value: any, country: string | number) {
       const foundArr = arr.find((obj) => obj.Cat == value);
       if (foundArr) return foundArr[country];
       return "";
     },
-    getPointsPerCountry(arr: any[]) {
-      const firstObj = arr[0];
-      const formattedArray = Object.keys(firstObj).filter(
+    formatLawIndex(arr: any[]) {
+      const formattedArray = Object.keys(arr[0]).filter(
         (key) =>
           key !== "Cat" &&
           key !== "Criterion" &&
@@ -112,21 +163,21 @@ export default {
       const newArray = formattedArray.map((country) => {
         const newObj: { [key: string]: any } = {
           location: country,
-          legislation: this.sortAccordionData(arr, "1.", country),
-          caseLaw: this.sortAccordionData(arr, "2.", country),
-          gazette: this.sortAccordionData(arr, "3.", country),
+          legislation: this.formatAccordionData(arr, "1.", country),
+          caseLaw: this.formatAccordionData(arr, "2.", country),
+          gazette: this.formatAccordionData(arr, "3.", country),
         };
-        newObj.score = Math.floor(
-          (newObj.legislation.total * 100 +
-            newObj.caseLaw.total * 100 +
-            newObj.gazette.total * 100) /
-            190
-        );
+        newObj.score =
+          ((newObj.legislation.total +
+            newObj.caseLaw.total +
+            newObj.gazette.total) *
+            100) /
+          190;
         return newObj;
       });
       return newArray;
     },
-    sortAccordionData(arr: any[], filterValue: string, country: string) {
+    formatAccordionData(arr: any[], filterValue: string, country: string) {
       const objToReturn: { [key: string]: any } = {};
       const childrenArray = arr
         .filter((el, index) => {
@@ -148,7 +199,9 @@ export default {
           return newObj;
         });
       objToReturn.childrenArray = childrenArray;
-      objToReturn.total = this.findObject(arr, parseInt(filterValue), country);
+      objToReturn.total = parseInt(
+        this.findDataPerCountry(arr, parseInt(filterValue), country)
+      );
 
       return objToReturn;
     },
