@@ -1,20 +1,19 @@
-table {
+.col, .col-1 {
+    padding-bottom: 5px;
+    padding-top: 5px;
+    border: 1px solid gray;
     border-collapse: collapse;
-    border: 1px solid black;
-    text-align: center;
-    vertical-align: middle;
-  }
-  
-  th,
-  td {
-    border: 1px solid black;
-    padding: 8px;
-  }
-  
-  thead th {
-    width: 25%;
-  }
-  
-  .accordion-body {
-    display: none;
-  }
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.table-head {
+    background-color: rgb(41,51,92);
+    color: #FFFFFF;
+}
+
+.container {
+    margin-top: 20px
+}
