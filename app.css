@@ -1,8 +1,10 @@
-.col, .col-1 {
+.col-2, .col-10, .col-4, .col-6 {
     padding-bottom: 5px;
     padding-top: 5px;
     border: 1px solid gray;
     border-collapse: collapse;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .pointer {
@@ -15,5 +17,5 @@
 }
 
 .container {
-    margin-top: 20px
+    margin: 20px auto;
 }

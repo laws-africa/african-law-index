@@ -10,14 +10,14 @@ const africanLawIndex = createApp({
 
     <div v-else>
       <div class="row table-head">
-        <div class="col-1">Rank</div>
-        <div class="col pointer" @click="sortByColumn('location')">Place</div>
-        <div class="col pointer" @click="sortByColumn('legislation')">
+        <div class="col-2">Rank</div>
+        <div class="col-2 pointer" @click="sortByColumn('location')">Place</div>
+        <div class="col-2 pointer" @click="sortByColumn('legislation')">
           Legislation
         </div>
-        <div class="col pointer" @click="sortByColumn('caseLaw')">Case Law</div>
-        <div class="col pointer" @click="sortByColumn('gazette')">Gazettes</div>
-        <div class="col pointer" @click="sortByColumn('score')">Score</div>
+        <div class="col-2 pointer" @click="sortByColumn('caseLaw')">Case Law</div>
+        <div class="col-2 pointer" @click="sortByColumn('gazette')">Gazettes</div>
+        <div class="col-2 pointer" @click="sortByColumn('score')">Score</div>
       </div>
       <div v-for="(access, access_index) in lawIndex" :key="access_index">
         <div
@@ -28,34 +28,34 @@ const africanLawIndex = createApp({
           aria-expanded="false"
           :aria-controls="access.location"
         >
-          <div class="col-1">{{ access_index + 1 }}</div>
-          <div class="col">{{ access.location }}</div>
-          <div class="col">
+          <div class="col-2">{{ access_index + 1 }}</div>
+          <div class="col-2">{{ access.location }}</div>
+          <div class="col-2">
             {{ Math.floor((access.legislation.total * 100) / 70) }}%
           </div>
-          <div class="col">
+          <div class="col-2">
             {{ Math.floor((access.caseLaw.total * 100) / 60) }}%
           </div>
-          <div class="col">
+          <div class="col-2">
             {{ Math.floor((access.gazette.total * 100) / 60) }}%
           </div>
-          <div class="col">{{ Math.floor(access.score) }}%</div>
+          <div class="col-2">{{ Math.floor(access.score) }}%</div>
         </div>
 
         <div class="collapse row" :id="access.location">
-          <div class="col-1"></div>
-          <div class="col">
+          <div class="col-2"></div>
+          <div class="col-10">
             <div>
               <p>{{ access.location }}</p>
-              <div class="p-3">
+              <div class="p-2">
                 <div class="row table-head">
-                  <div class="col">Legislation</div>
-                  <div class="col">
+                  <div class="col-4">Legislation</div>
+                  <div class="col-6">
                     <a :href="access.legislation.website" target="_blank">
                       Description
                     </a>
                   </div>
-                  <div class="col">Points</div>
+                  <div class="col-2">Points</div>
                 </div>
                 <div
                   class="row"
@@ -63,30 +63,30 @@ const africanLawIndex = createApp({
                     .legislation.childrenArray"
                   :key="legislation_index"
                 >
-                  <div class="col">
+                  <div class="col-4">
                     {{ legislation.cat }} {{ legislation.criterion }}
                   </div>
-                  <div class="col">{{ legislation.comments }}</div>
-                  <div class="col">{{ legislation.score }}</div>
+                  <div class="col-6">{{ legislation.comments }}</div>
+                  <div class="col-2">{{ legislation.score }}</div>
                 </div>
                 <div class="row">
-                  <div class="col fw-bold">TOTAL</div>
-                  <div class="col">{{ access.legislation.comments }}</div>
-                  <div class="col fw-bold">
+                  <div class="col-4 fw-bold">TOTAL</div>
+                  <div class="col-6">{{ access.legislation.comments }}</div>
+                  <div class="col-2 fw-bold">
                     {{ access.legislation.total }}
                   </div>
                 </div>
               </div>
 
-              <div class="p-3">
+              <div class="p-2">
                 <div class="row table-head">
-                  <div class="col">Case Law</div>
-                  <div class="col">
+                  <div class="col-4">Case Law</div>
+                  <div class="col-6">
                     <a :href="access.caseLaw.website" target="_blank">
                       Description
                     </a>
                   </div>
-                  <div class="col">Points</div>
+                  <div class="col-2">Points</div>
                 </div>
                 <div
                   class="row"
@@ -94,28 +94,28 @@ const africanLawIndex = createApp({
                     .caseLaw.childrenArray"
                   :key="caseLaw_index"
                 >
-                  <div class="col">{{ caseLaw.cat }} {{ caseLaw.criterion }}</div>
-                  <div class="col">{{ caseLaw.comments }}</div>
-                  <div class="col">{{ caseLaw.score }}</div>
+                  <div class="col-4">{{ caseLaw.cat }} {{ caseLaw.criterion }}</div>
+                  <div class="col-6">{{ caseLaw.comments }}</div>
+                  <div class="col-2">{{ caseLaw.score }}</div>
                 </div>
                 <div class="row">
-                  <div class="col fw-bold">TOTAL</div>
-                  <div class="col">{{ access.caseLaw.comments }}</div>
-                  <div class="col fw-bold">
+                  <div class="col-4 fw-bold">TOTAL</div>
+                  <div class="col-6">{{ access.caseLaw.comments }}</div>
+                  <div class="col-2 fw-bold">
                     {{ access.caseLaw.total }}
                   </div>
                 </div>
               </div>
 
-              <div class="p-3">
+              <div class="p-2">
                 <div class="row table-head">
-                  <div class="col">Gazettes</div>
-                  <div class="col">
+                  <div class="col-4">Gazettes</div>
+                  <div class="col-6">
                     <a :href="access.gazette.website" target="_blank">
                       Description
                     </a>
                   </div>
-                  <div class="col">Points</div>
+                  <div class="col-2">Points</div>
                 </div>
                 <div
                   class="row"
@@ -123,14 +123,14 @@ const africanLawIndex = createApp({
                     .gazette.childrenArray"
                   :key="gazette_index"
                 >
-                  <div class="col">{{ gazette.cat }} {{ gazette.criterion }}</div>
-                  <div class="col">{{ gazette.comments }}</div>
-                  <div class="col">{{ gazette.score }}</div>
+                  <div class="col-4">{{ gazette.cat }} {{ gazette.criterion }}</div>
+                  <div class="col-6">{{ gazette.comments }}</div>
+                  <div class="col-2">{{ gazette.score }}</div>
                 </div>
                 <div class="row">
-                  <div class="col fw-bold">TOTAL</div>
-                  <div class="col">{{ access.gazette.comments }}</div>
-                  <div class="col fw-bold">
+                  <div class="col-4 fw-bold">TOTAL</div>
+                  <div class="col-6">{{ access.gazette.comments }}</div>
+                  <div class="col-2 fw-bold">
                     {{ access.gazette.total }}
                   </div>
                 </div>
