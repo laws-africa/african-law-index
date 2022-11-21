@@ -1,136 +1,130 @@
-import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+const { createApp } = Vue;
 
 const africanLawIndex = createApp({
   template: `<div class="container">
-    <div v-if="loading" class="d-flex mt-5 justify-content-center">
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+    <div v-if="loading" class="spinner-container">
+      <div class="spinner" role="status"></div>
     </div>
 
     <div v-else>
-      <div class="row table-head">
-        <div class="col-2">Rank</div>
-        <div class="col-2 pointer" @click="sortByColumn('location')">Place</div>
-        <div class="col-2 pointer" @click="sortByColumn('legislation')">
+      <div class="table-row table-head">
+        <div class="table-column first-column__main">Rank</div>
+        <div class="table-column second-column__main pointer" @click="sortByColumn('location')">Place</div>
+        <div class="table-column third-column__main pointer" @click="sortByColumn('legislation')">
           Legislation
         </div>
-        <div class="col-2 pointer" @click="sortByColumn('caseLaw')">Case Law</div>
-        <div class="col-2 pointer" @click="sortByColumn('gazette')">Gazettes</div>
-        <div class="col-2 pointer" @click="sortByColumn('score')">Score</div>
+        <div class="table-column fourth-column__main pointer" @click="sortByColumn('caseLaw')">Case Law</div>
+        <div class="table-column fifth-column__main pointer" @click="sortByColumn('gazette')">Gazettes</div>
+        <div class="table-column sixth-column__main pointer" @click="sortByColumn('score')">Score</div>
       </div>
       <div v-for="(access, access_index) in lawIndex" :key="access_index">
         <div
-          class="row pointer"
-          data-bs-toggle="collapse"
-          :data-bs-target="'#' + access.location"
-          role="button"
-          aria-expanded="false"
-          :aria-controls="access.location"
+          class="table-row accordion-collapse pointer"
+          @click="(e) => toggleAccordion(e, access.location)"
         >
-          <div class="col-2">{{ access_index + 1 }}</div>
-          <div class="col-2">{{ access.location }}</div>
-          <div class="col-2">
+          <div class="table-column first-column__main">{{ access_index + 1 }}</div>
+          <div class="table-column second-column__main">{{ access.location }}</div>
+          <div class="table-column third-column__main">
             {{ Math.floor((access.legislation.total * 100) / 70) }}%
           </div>
-          <div class="col-2">
+          <div class="table-column fourth-column__main">
             {{ Math.floor((access.caseLaw.total * 100) / 60) }}%
           </div>
-          <div class="col-2">
+          <div class="table-column fifth-column__main">
             {{ Math.floor((access.gazette.total * 100) / 60) }}%
           </div>
-          <div class="col-2">{{ Math.floor(access.score) }}%</div>
+          <div class="table-column sixth-column__main">{{ Math.floor(access.score) }}%</div>
         </div>
 
-        <div class="collapse row" :id="access.location">
-          <div class="col-2"></div>
-          <div class="col-10">
+        <div class="dropdown table-row" :id="access.location">
+          <div class="table-column first-column__main"></div>
+          <div class="table-column second-column__dropdown">
             <div>
-              <p>{{ access.location }}</p>
-              <div class="p-2">
-                <div class="row table-head">
-                  <div class="col-4">Legislation</div>
-                  <div class="col-6">
+              <div>{{ access.location }}</div>
+              <div class="dropdown-content">
+                <div class="table-row table-head">
+                  <div class="table-column first-column__dropdown-content">Legislation</div>
+                  <div class="table-column second-column__dropdown-content">
                     <a :href="access.legislation.website" target="_blank">
                       Description
                     </a>
                   </div>
-                  <div class="col-2">Points</div>
+                  <div class="table-column sixth-column__main">Points</div>
                 </div>
                 <div
-                  class="row"
+                  class="table-row"
                   v-for="(legislation, legislation_index) in access
                     .legislation.childrenArray"
                   :key="legislation_index"
                 >
-                  <div class="col-4">
+                  <div class="table-column first-column__dropdown-content">
                     {{ legislation.cat }} {{ legislation.criterion }}
                   </div>
-                  <div class="col-6">{{ legislation.comments }}</div>
-                  <div class="col-2">{{ legislation.score }}</div>
+                  <div class="table-column second-column__dropdown-content">{{ legislation.comments }}</div>
+                  <div class="table-column sixth-column__main">{{ legislation.score }}</div>
                 </div>
-                <div class="row">
-                  <div class="col-4 fw-bold">TOTAL</div>
-                  <div class="col-6">{{ access.legislation.comments }}</div>
-                  <div class="col-2 fw-bold">
+                <div class="table-row">
+                  <div class="table-column first-column__dropdown-content font-bold">TOTAL</div>
+                  <div class="table-column second-column__dropdown-content">{{ access.legislation.comments }}</div>
+                  <div class="table-column sixth-column__main font-bold">
                     {{ access.legislation.total }}
                   </div>
                 </div>
               </div>
 
-              <div class="p-2">
-                <div class="row table-head">
-                  <div class="col-4">Case Law</div>
-                  <div class="col-6">
+              <div class="dropdown-content">
+                <div class="table-row table-head">
+                  <div class="table-column first-column__dropdown-content">Case Law</div>
+                  <div class="table-column second-column__dropdown-content">
                     <a :href="access.caseLaw.website" target="_blank">
                       Description
                     </a>
                   </div>
-                  <div class="col-2">Points</div>
+                  <div class="table-column sixth-column__main">Points</div>
                 </div>
                 <div
-                  class="row"
+                  class="table-row"
                   v-for="(caseLaw, caseLaw_index) in access
                     .caseLaw.childrenArray"
                   :key="caseLaw_index"
                 >
-                  <div class="col-4">{{ caseLaw.cat }} {{ caseLaw.criterion }}</div>
-                  <div class="col-6">{{ caseLaw.comments }}</div>
-                  <div class="col-2">{{ caseLaw.score }}</div>
+                  <div class="table-column first-column__dropdown-content">{{ caseLaw.cat }} {{ caseLaw.criterion }}</div>
+                  <div class="table-column second-column__dropdown-content">{{ caseLaw.comments }}</div>
+                  <div class="table-column sixth-column__main">{{ caseLaw.score }}</div>
                 </div>
-                <div class="row">
-                  <div class="col-4 fw-bold">TOTAL</div>
-                  <div class="col-6">{{ access.caseLaw.comments }}</div>
-                  <div class="col-2 fw-bold">
+                <div class="table-row">
+                  <div class="table-column first-column__dropdown-content font-bold">TOTAL</div>
+                  <div class="table-column second-column__dropdown-content">{{ access.caseLaw.comments }}</div>
+                  <div class="table-column sixth-column__main font-bold">
                     {{ access.caseLaw.total }}
                   </div>
                 </div>
               </div>
 
-              <div class="p-2">
-                <div class="row table-head">
-                  <div class="col-4">Gazettes</div>
-                  <div class="col-6">
+              <div class="dropdown-content">
+                <div class="table-row table-head">
+                  <div class="table-column first-column__dropdown-content">Gazettes</div>
+                  <div class="table-column second-column__dropdown-content">
                     <a :href="access.gazette.website" target="_blank">
                       Description
                     </a>
                   </div>
-                  <div class="col-2">Points</div>
+                  <div class="table-column sixth-column__main">Points</div>
                 </div>
                 <div
-                  class="row"
+                  class="table-row"
                   v-for="(gazette, gazette_index) in access
                     .gazette.childrenArray"
                   :key="gazette_index"
                 >
-                  <div class="col-4">{{ gazette.cat }} {{ gazette.criterion }}</div>
-                  <div class="col-6">{{ gazette.comments }}</div>
-                  <div class="col-2">{{ gazette.score }}</div>
+                  <div class="table-column first-column__dropdown-content">{{ gazette.cat }} {{ gazette.criterion }}</div>
+                  <div class="table-column second-column__dropdown-content">{{ gazette.comments }}</div>
+                  <div class="table-column sixth-column__main">{{ gazette.score }}</div>
                 </div>
-                <div class="row">
-                  <div class="col-4 fw-bold">TOTAL</div>
-                  <div class="col-6">{{ access.gazette.comments }}</div>
-                  <div class="col-2 fw-bold">
+                <div class="table-row">
+                  <div class="table-column first-column__dropdown-content font-bold">TOTAL</div>
+                  <div class="table-column second-column__dropdown-content">{{ access.gazette.comments }}</div>
+                  <div class="table-column sixth-column__main font-bold">
                     {{ access.gazette.total }}
                   </div>
                 </div>
@@ -161,6 +155,7 @@ const africanLawIndex = createApp({
         const lawData = this.formatLawIndex(json);
         this.lawIndex = lawData;
         this.loading = false;
+        console.log(json, lawData)
       } else {
         console.log("HTTP-Error: " + response.status);
       }
@@ -259,6 +254,15 @@ const africanLawIndex = createApp({
       else if (field === "score")
         this.lawIndex.sort((a, b) => a[field] - b[field]);
       else this.lawIndex.sort((a, b) => a[field].total - b[field].total);
+    },
+    toggleAccordion(e, location) {
+        const dropdown = document.querySelector(`#${location}`);
+        
+        if (dropdown.style.maxHeight) {
+            dropdown.style.maxHeight = null;
+        } else {
+            dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+        }
     },
   },
 });
