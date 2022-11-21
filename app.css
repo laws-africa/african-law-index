@@ -1,6 +1,5 @@
-.col-2, .col-10, .col-4, .col-6 {
-    padding-bottom: 5px;
-    padding-top: 5px;
+.table-column {
+    padding: 0.5em 1em;
     border: 1px solid gray;
     border-collapse: collapse;
     overflow: hidden;
@@ -18,4 +17,91 @@
 
 .container {
     margin: 20px auto;
+}
+
+.table-row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+}
+
+.col-10 {
+    grid-column: 2/13;
+}
+  
+.first-column__main {
+    grid-column: 1/3;
+}
+
+.second-column__main {
+    grid-column: 3/5;
+}
+
+.third-column__main {
+    grid-column: 5/7;
+}
+
+.fourth-column__main {
+    grid-column: 7/9;
+}
+
+.fifth-column__main {
+    grid-column: 9/11;
+}
+
+.sixth-column__main {
+    grid-column: 11/13;
+}
+
+.second-column__dropdown {
+    grid-column: 3/13;
+}
+
+.first-column__dropdown-content {
+    grid-column: 1/5;
+}
+
+.second-column__dropdown-content {
+    grid-column: 5/11;
+}
+
+.dropdown-content {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.font-bold {
+    font-weight: 600;
+}
+
+.dropdown {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+.spinner {
+    display: inline-block;
+    animation: 0.75s linear infinite spinner;
+    animation-play-state: inherit;
+    border: solid 0.25em currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    vertical-align: -0.125em;
+}
+
+@keyframes spinner {
+    0% {
+      transform: translate3d(-50%, -50%, 0) rotate(0deg);
+    }
+    100% {
+      transform: translate3d(-50%, -50%, 0) rotate(360deg);
+    }
+}
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
 }
