@@ -2,9 +2,11 @@ const { createApp } = Vue;
 
 const africanLawIndex = createApp({
   template: `<div class="container">
-    <div v-if="loading" class="spinner-container">
+    <div v-if="loading" class="center-align">
       <div class="spinner" role="status"></div>
     </div>
+
+    <div class="center-align" v-else-if="!loading && !status">An error occured while loading the data. Please try again later.</div>
 
     <div v-else>
       <div class="table-row table-head">
@@ -54,7 +56,7 @@ const africanLawIndex = createApp({
                 <div
                   class="table-row"
                   v-for="(legislation, legislation_index) in access
-                    .legislation.childrenArray"
+                    .legislation.criteria"
                   :key="legislation_index"
                 >
                   <div class="table-column first-column__dropdown-content">
@@ -85,7 +87,7 @@ const africanLawIndex = createApp({
                 <div
                   class="table-row"
                   v-for="(caseLaw, caseLaw_index) in access
-                    .caseLaw.childrenArray"
+                    .caseLaw.criteria"
                   :key="caseLaw_index"
                 >
                   <div class="table-column first-column__dropdown-content">{{ caseLaw.cat }} {{ caseLaw.criterion }}</div>
@@ -114,7 +116,7 @@ const africanLawIndex = createApp({
                 <div
                   class="table-row"
                   v-for="(gazette, gazette_index) in access
-                    .gazette.childrenArray"
+                    .gazette.criteria"
                   :key="gazette_index"
                 >
                   <div class="table-column first-column__dropdown-content">{{ gazette.cat }} {{ gazette.criterion }}</div>
@@ -146,65 +148,69 @@ const africanLawIndex = createApp({
   },
   methods: {
     async fetchLawIndex() {
-      let response = await fetch(
+      const response = await fetch(
         "https://docs.google.com/spreadsheets/d/e/2PACX-1vToqs8Oyz-t2FyHSHAmoqBvFiaR90j2L0XRysS_Wc7IaK6ZVdEhWRDo_jFJNdLqS-1W-OS00UxmLsCg/pub?gid=1585265851&single=true&output=csv"
       );
 
+      this.status = response.ok;
+
       if (response.ok) {
-        let json = this.convertToJson(await response.text());
-        const lawData = this.formatLawIndex(json);
-        this.lawIndex = lawData;
+        const json = this.convertToJson(await response.text());
+        this.lawIndex = this.formatLawIndex(json);
         this.loading = false;
-        console.log(json, lawData)
       } else {
+        this.loading = false;
         console.log("HTTP-Error: " + response.status);
       }
     },
     convertToJson(str) {
-      let data = str
+      const data = str
         .split("\r\n")
         .map((i) => i.replace(/\"/g, "").split(/,(?=\S)/));
-      let headers = data.shift();
-      let output = data.map((d) => {
-        let obj = {};
-        headers.map((h, i) => (obj[headers[i]] = d[i]));
-        return obj;
+      const keys = data.shift();
+      return data.map((value) => {
+        const keyValuePair = {};
+        keys.map((key, i) => (keyValuePair[key] = value[i]));
+        return keyValuePair;
       });
-      return output;
     },
-    findDataPerCountry(arr, value, country) {
+    findDataPerKey(arr, value, key) {
       const foundArr = arr.find((obj) => obj.Cat == value);
-      if (foundArr[country]) return foundArr[country];
-      return "";
+      return foundArr[key] || "";
     },
     formatLawIndex(arr) {
-      const formattedArray = Object.keys(arr[0]).filter(
+      // We need to format our jsonOutput so that it's readable and more structured.
+      // This helps us populate the table easily.
+
+      // The goal is to sort jsonOutput per country
+      // so that each array element contains all relvant info about the specified country.
+      
+      const countries = Object.keys(arr[0]).filter(
         (key) =>
           key !== "Cat" &&
           key !== "Criterion" &&
           key !== "Comments" &&
           key !== "points"
       );
-      const newArray = formattedArray.map((country) => {
-        const newObj = {
+      return countries.map((country) => {
+        const dataPerCountry = {
           location: country,
           legislation: this.formatAccordionData(arr, "1.", country),
           caseLaw: this.formatAccordionData(arr, "2.", country),
           gazette: this.formatAccordionData(arr, "3.", country),
         };
-        newObj.score =
-          ((newObj.legislation.total +
-            newObj.caseLaw.total +
-            newObj.gazette.total) *
+        dataPerCountry.score =
+          ((dataPerCountry.legislation.total +
+            dataPerCountry.caseLaw.total +
+            dataPerCountry.gazette.total) *
             100) /
           190;
-        return newObj;
+        return dataPerCountry;
       });
-      return newArray;
     },
     formatAccordionData(arr, filterValue, country) {
       const objToReturn = {};
-      const childrenArray = arr
+      objToReturn.criteria = arr
         .filter((el, index) => {
           if (
             el.Cat.startsWith(filterValue) &&
@@ -215,22 +221,21 @@ const africanLawIndex = createApp({
           return el.Cat.startsWith(filterValue);
         })
         .map((obj) => {
-          const newObj = {
+          const criterionData = {
             cat: obj.Cat,
             criterion: obj.Criterion,
             comments: obj.Comments,
             score: obj[country],
           };
-          return newObj;
+          return criterionData;
         });
-      objToReturn.childrenArray = childrenArray;
       objToReturn.total = parseInt(
-        this.findDataPerCountry(arr, parseInt(filterValue), country)
+        this.findDataPerKey(arr, parseInt(filterValue), country)
       );
       objToReturn.points = parseInt(
-        this.findDataPerCountry(arr, parseInt(filterValue), "points")
+        this.findDataPerKey(arr, parseInt(filterValue), "points")
       );
-      objToReturn.comments = this.findDataPerCountry(
+      objToReturn.comments = this.findDataPerKey(
         arr,
         parseInt(filterValue),
         "Comments"
@@ -256,13 +261,13 @@ const africanLawIndex = createApp({
       else this.lawIndex.sort((a, b) => a[field].total - b[field].total);
     },
     toggleAccordion(e, location) {
-        const dropdown = document.querySelector(`#${location}`);
-        
-        if (dropdown.style.maxHeight) {
-            dropdown.style.maxHeight = null;
-        } else {
-            dropdown.style.maxHeight = dropdown.scrollHeight + "px";
-        }
+      const dropdown = document.querySelector(`#${location}`);
+
+      if (dropdown.style.maxHeight) {
+        dropdown.style.maxHeight = null;
+      } else {
+        dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+      }
     },
   },
 });
