@@ -10,14 +10,14 @@ const africanLawIndex = createApp({
 
     <div v-else>
       <div class="table-row table-head">
-        <div class="table-column first-column__main pointer" @click="updateSortValue('rank')">Rank {{ displayArrow }}</div>
-        <div class="table-column second-column__main pointer" @click="updateSortValue('location')">Place {{ displayArrow }}</div>
+        <div class="table-column first-column__main pointer" @click="updateSortValue('rank')">Rank <span v-html="displayArrow('rank')"></span></div>
+        <div class="table-column second-column__main pointer" @click="updateSortValue('location')">Place <span v-html="displayArrow('location')"></span></div>
         <div class="table-column third-column__main pointer" @click="updateSortValue('legislation')">
-          Legislation {{ displayArrow }}
+          Legislation <span v-html="displayArrow('legislation')"></span>
         </div>
-        <div class="table-column fourth-column__main pointer" @click="updateSortValue('caseLaw')">Case Law {{ displayArrow }}</div>
-        <div class="table-column fifth-column__main pointer" @click="updateSortValue('gazette')">Gazettes {{ displayArrow }}</div>
-        <div class="table-column sixth-column__main pointer" @click="updateSortValue('score')">Score {{ displayArrow }}</div>
+        <div class="table-column fourth-column__main pointer" @click="updateSortValue('caseLaw')">Case Law <span v-html="displayArrow('caseLaw')"></span></div>
+        <div class="table-column fifth-column__main pointer" @click="updateSortValue('gazette')">Gazettes <span v-html="displayArrow('gazette')"></span></div>
+        <div class="table-column sixth-column__main pointer" @click="updateSortValue('score')">Score <span v-html="displayArrow('score')"></span></div>
       </div>
       <div v-for="(access, access_index) in lawIndex" :key="access_index">
         <div
@@ -156,19 +156,6 @@ const africanLawIndex = createApp({
       this.lawIndex = this.sortByColumn();
     },
   },
-  computed: {
-    displayArrow() {
-      let arrow;
-
-      Object.keys(this.currentSortValue).forEach((key) => {
-        if (this.currentSortValue[key] === "asc") arrow = "&uarr;";
-        else if (this.currentSortValue[key] === "desc") arrow = "&darr;";
-        else arrow = "";
-      });
-
-      return arrow;
-    },
-  },
   mounted() {
     this.fetchLawIndex();
   },
@@ -183,6 +170,7 @@ const africanLawIndex = createApp({
       if (response.ok) {
         const json = this.convertToJson(await response.text());
         this.lawIndex = this.formatLawIndex(json);
+        this.updateSortValue('rank')
         this.loading = false;
       } else {
         this.loading = false;
@@ -233,9 +221,10 @@ const africanLawIndex = createApp({
           190;
         return dataPerCountry;
       });
-      return this.sortByColumn(unsortedLawIndex).map(
-        (countryData, index) => ({ ...countryData, rank: index + 1 })
-      );
+      return this.sortByColumn(unsortedLawIndex).map((countryData, index) => ({
+        ...countryData,
+        rank: index + 1,
+      }));
     },
     formatAccordionData(arr, filterValue, country) {
       const objToReturn = {};
@@ -292,6 +281,7 @@ const africanLawIndex = createApp({
         },
         [field]: sortValue,
       };
+      this.displayArrow(field);
     },
     sortByColumn(arr = this.lawIndex) {
       const currentLawIndex = [...arr];
@@ -321,6 +311,12 @@ const africanLawIndex = createApp({
       });
 
       return currentLawIndex;
+    },
+    displayArrow(field) {
+      if (this.currentSortValue[field] === "asc") return "<span>&uarr;</span>";
+      else if (this.currentSortValue[field] === "desc")
+        return "<span>&darr;</span>";
+      else return "";
     },
     toggleAccordion(e, location) {
       const dropdown = document.querySelector(`#${location}`);
