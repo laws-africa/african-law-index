@@ -10,21 +10,21 @@ const africanLawIndex = createApp({
 
     <div v-else>
       <div class="table-row table-head">
-        <div class="table-column first-column__main">Rank</div>
-        <div class="table-column second-column__main pointer" @click="sortByColumn('location')">Place</div>
-        <div class="table-column third-column__main pointer" @click="sortByColumn('legislation')">
-          Legislation
+        <div class="table-column first-column__main pointer" @click="updateSortValue('rank')">Rank {{ displayArrow }}</div>
+        <div class="table-column second-column__main pointer" @click="updateSortValue('location')">Place {{ displayArrow }}</div>
+        <div class="table-column third-column__main pointer" @click="updateSortValue('legislation')">
+          Legislation {{ displayArrow }}
         </div>
-        <div class="table-column fourth-column__main pointer" @click="sortByColumn('caseLaw')">Case Law</div>
-        <div class="table-column fifth-column__main pointer" @click="sortByColumn('gazette')">Gazettes</div>
-        <div class="table-column sixth-column__main pointer" @click="sortByColumn('score')">Score</div>
+        <div class="table-column fourth-column__main pointer" @click="updateSortValue('caseLaw')">Case Law {{ displayArrow }}</div>
+        <div class="table-column fifth-column__main pointer" @click="updateSortValue('gazette')">Gazettes {{ displayArrow }}</div>
+        <div class="table-column sixth-column__main pointer" @click="updateSortValue('score')">Score {{ displayArrow }}</div>
       </div>
       <div v-for="(access, access_index) in lawIndex" :key="access_index">
         <div
           class="table-row accordion-collapse pointer"
           @click="(e) => toggleAccordion(e, access.location)"
         >
-          <div class="table-column first-column__main">{{ access_index + 1 }}</div>
+          <div class="table-column first-column__main">{{ access.rank }}</div>
           <div class="table-column second-column__main">{{ access.location }}</div>
           <div class="table-column third-column__main">
             {{ Math.floor((access.legislation.total * 100) / 70) }}%
@@ -141,7 +141,33 @@ const africanLawIndex = createApp({
     return {
       lawIndex: [],
       loading: true,
+      currentSortValue: {
+        rank: "",
+        location: "",
+        legislation: "",
+        caseLaw: "",
+        gazette: "",
+        score: "desc",
+      },
     };
+  },
+  watch: {
+    currentSortValue() {
+      this.lawIndex = this.sortByColumn();
+    },
+  },
+  computed: {
+    displayArrow() {
+      let arrow;
+
+      Object.keys(this.currentSortValue).forEach((key) => {
+        if (this.currentSortValue[key] === "asc") arrow = "&uarr;";
+        else if (this.currentSortValue[key] === "desc") arrow = "&darr;";
+        else arrow = "";
+      });
+
+      return arrow;
+    },
   },
   mounted() {
     this.fetchLawIndex();
@@ -184,7 +210,7 @@ const africanLawIndex = createApp({
 
       // The goal is to sort jsonOutput per country
       // so that each array element contains all relvant info about the specified country.
-      
+
       const countries = Object.keys(arr[0]).filter(
         (key) =>
           key !== "Cat" &&
@@ -192,7 +218,7 @@ const africanLawIndex = createApp({
           key !== "Comments" &&
           key !== "points"
       );
-      return countries.map((country) => {
+      const unsortedLawIndex = countries.map((country, index) => {
         const dataPerCountry = {
           location: country,
           legislation: this.formatAccordionData(arr, "1.", country),
@@ -207,6 +233,9 @@ const africanLawIndex = createApp({
           190;
         return dataPerCountry;
       });
+      return this.sortByColumn(unsortedLawIndex).map(
+        (countryData, index) => ({ ...countryData, rank: index + 1 })
+      );
     },
     formatAccordionData(arr, filterValue, country) {
       const objToReturn = {};
@@ -243,22 +272,55 @@ const africanLawIndex = createApp({
 
       return objToReturn;
     },
-    sortByColumn(field) {
-      if (field === "location")
-        this.lawIndex.sort((a, b) => {
-          const locationA = a.location.toLowerCase();
-          const locationB = b.location.toLowerCase();
-          if (locationA < locationB) {
-            return -1;
-          }
-          if (locationA > locationB) {
-            return 1;
-          }
-          return 0;
-        });
-      else if (field === "score")
-        this.lawIndex.sort((a, b) => a[field] - b[field]);
-      else this.lawIndex.sort((a, b) => a[field].total - b[field].total);
+    updateSortValue(field) {
+      let sortValue;
+      if (this.currentSortValue[field] === "") {
+        sortValue = "asc";
+      } else if (this.currentSortValue[field] === "asc") {
+        sortValue = "desc";
+      } else if (this.currentSortValue[field] === "desc") {
+        sortValue = "asc";
+      }
+      this.currentSortValue = {
+        ...{
+          rank: "",
+          location: "",
+          legislation: "",
+          caseLaw: "",
+          gazette: "",
+          score: "",
+        },
+        [field]: sortValue,
+      };
+    },
+    sortByColumn(arr = this.lawIndex) {
+      const currentLawIndex = [...arr];
+
+      Object.keys(this.currentSortValue).forEach((key) => {
+        if (this.currentSortValue[key]) {
+          currentLawIndex.sort((a, b) => {
+            let fieldA, fieldB;
+            if (key === "location") {
+              fieldA = a[key] ? a[key].toLowerCase() : "";
+              fieldB = b[key] ? b[key].toLowerCase() : "";
+            } else if (key === "score" || key === "rank") {
+              fieldA = a[key];
+              fieldB = b[key];
+            } else {
+              fieldA = a[key].total;
+              fieldB = b[key].total;
+            }
+
+            if (this.currentSortValue[key] === "asc") {
+              return String(fieldA).localeCompare(String(fieldB));
+            } else if (this.currentSortValue[key] === "desc") {
+              return String(fieldB).localeCompare(String(fieldA));
+            }
+          });
+        }
+      });
+
+      return currentLawIndex;
     },
     toggleAccordion(e, location) {
       const dropdown = document.querySelector(`#${location}`);
