@@ -1,4 +1,4 @@
-.table-column {
+.law-index__table-column {
     padding: 0.5em 1em;
     border: 1px solid gray;
     border-collapse: collapse;
@@ -6,20 +6,20 @@
     text-overflow: ellipsis;
 }
 
-.pointer {
+.law-index__pointer {
     cursor: pointer;
 }
 
-.table-head {
+.law-index__table-head {
     background-color: rgb(41,51,92);
     color: #FFFFFF;
 }
 
-.container {
+.law-index__container {
     margin: 20px auto;
 }
 
-.table-row {
+.law-index__table-row {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
 }
@@ -44,7 +44,7 @@
     grid-column: 9/11;
 }
 
-.sixth-column__main {
+.last-column__main {
     grid-column: 11/13;
 }
 
@@ -60,22 +60,22 @@
     grid-column: 5/11;
 }
 
-.dropdown-content {
+.law-index__dropdown-content {
     margin-top: 20px;
     margin-bottom: 20px;
 }
 
-.font-bold {
+.law-index__font-bold {
     font-weight: 600;
 }
 
-.dropdown {
+.law-index__dropdown {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.2s ease-out;
 }
 
-.spinner {
+.law-index__spinner {
     display: inline-block;
     animation: 0.75s linear infinite spinner;
     animation-play-state: inherit;
@@ -96,12 +96,12 @@
     }
 }
 
-.center-align {
+.law-index__center-align {
     display: flex;
     justify-content: center;
     margin-top: 40px;
 }
 
-a {
+.law-index__table-column a {
     color: inherit;
 }
