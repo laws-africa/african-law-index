@@ -1,132 +1,253 @@
 const { createApp } = Vue;
 
 const africanLawIndex = createApp({
-  template: `<div class="container">
-    <div v-if="loading" class="center-align">
-      <div class="spinner" role="status"></div>
+  template: `<div class="law-index__container">
+    <div v-if="loading" class="law-index__center-align">
+      <div class="law-index__spinner" role="status"></div>
     </div>
 
-    <div class="center-align" v-else-if="!loading && !status">An error occured while loading the data. Please try again later.</div>
+    <div class="law-index__center-align" v-else-if="!loading && !status">
+      An error occured while loading the data. Please try again later.
+    </div>
 
     <div v-else>
-      <div class="table-row table-head">
-        <div class="table-column first-column__main pointer" @click="updateSortValue('rank')">Rank <span v-html="displayArrow('rank')"></span></div>
-        <div class="table-column second-column__main pointer" @click="updateSortValue('location')">Place <span v-html="displayArrow('location')"></span></div>
-        <div class="table-column third-column__main pointer" @click="updateSortValue('legislation')">
+      <div class="law-index__table-row law-index__table-head">
+        <div
+          class="law-index__table-column first-column__main law-index__pointer"
+          @click="updateSortValue('rank')"
+        >
+          Rank <span v-html="displayArrow('rank')"></span>
+        </div>
+        <div
+          class="law-index__table-column second-column__main law-index__pointer"
+          @click="updateSortValue('location')"
+        >
+          Place <span v-html="displayArrow('location')"></span>
+        </div>
+        <div
+          class="law-index__table-column third-column__main law-index__pointer"
+          @click="updateSortValue('legislation')"
+        >
           Legislation <span v-html="displayArrow('legislation')"></span>
         </div>
-        <div class="table-column fourth-column__main pointer" @click="updateSortValue('caseLaw')">Case Law <span v-html="displayArrow('caseLaw')"></span></div>
-        <div class="table-column fifth-column__main pointer" @click="updateSortValue('gazette')">Gazettes <span v-html="displayArrow('gazette')"></span></div>
-        <div class="table-column sixth-column__main pointer" @click="updateSortValue('score')">Score <span v-html="displayArrow('score')"></span></div>
+        <div
+          class="law-index__table-column fourth-column__main law-index__pointer"
+          @click="updateSortValue('caseLaw')"
+        >
+          Case Law <span v-html="displayArrow('caseLaw')"></span>
+        </div>
+        <div
+          class="law-index__table-column fifth-column__main law-index__pointer"
+          @click="updateSortValue('gazette')"
+        >
+          Gazettes <span v-html="displayArrow('gazette')"></span>
+        </div>
+        <div
+          class="law-index__table-column last-column__main law-index__pointer"
+          @click="updateSortValue('score')"
+        >
+          Score <span v-html="displayArrow('score')"></span>
+        </div>
       </div>
       <div v-for="(access, access_index) in lawIndex" :key="access_index">
         <div
-          class="table-row accordion-collapse pointer"
+          class="law-index__table-row law-index__pointer"
           @click="(e) => toggleAccordion(e, access.location)"
         >
-          <div class="table-column first-column__main">{{ access.rank }}</div>
-          <div class="table-column second-column__main">{{ access.location }}</div>
-          <div class="table-column third-column__main">
-            {{ Math.floor((access.legislation.total * 100) / 70) }}%
+          <div class="law-index__table-column first-column__main">
+            {{ access.rank }}
           </div>
-          <div class="table-column fourth-column__main">
-            {{ Math.floor((access.caseLaw.total * 100) / 60) }}%
+          <div class="law-index__table-column second-column__main">
+            {{ access.location }}
           </div>
-          <div class="table-column fifth-column__main">
-            {{ Math.floor((access.gazette.total * 100) / 60) }}%
+          <div class="law-index__table-column third-column__main">
+            {{ Math.floor((access.legislation.total * 100) / access.legislation.points) }}%
           </div>
-          <div class="table-column sixth-column__main">{{ Math.floor(access.score) }}%</div>
+          <div class="law-index__table-column fourth-column__main">
+            {{ Math.floor((access.caseLaw.total * 100) / access.caseLaw.points) }}%
+          </div>
+          <div class="law-index__table-column fifth-column__main">
+            {{ Math.floor((access.gazette.total * 100) / access.gazette.points) }}%
+          </div>
+          <div class="law-index__table-column last-column__main">
+            {{ Math.floor(access.score) }}%
+          </div>
         </div>
 
-        <div class="dropdown table-row" :id="access.location">
-          <div class="table-column first-column__main"></div>
-          <div class="table-column second-column__dropdown">
+        <div
+          class="law-index__dropdown law-index__table-row"
+          :id="access.location"
+        >
+          <div class="law-index__table-column first-column__main"></div>
+          <div class="law-index__table-column second-column__dropdown">
             <div>
               <div>{{ access.location }}</div>
-              <div class="dropdown-content">
-                <div class="table-row table-head">
-                  <div class="table-column first-column__dropdown-content">Legislation</div>
-                  <div class="table-column second-column__dropdown-content">
+              <div class="law-index__dropdown-content">
+                <div class="law-index__table-row law-index__table-head">
+                  <div
+                    class="law-index__table-column first-column__dropdown-content"
+                  >
+                    Legislation
+                  </div>
+                  <div
+                    class="law-index__table-column second-column__dropdown-content"
+                  >
                     <a :href="access.legislation.website" target="_blank">
                       Description
                     </a>
                   </div>
-                  <div class="table-column sixth-column__main">Points</div>
+                  <div class="law-index__table-column last-column__main">
+                    Points
+                  </div>
                 </div>
                 <div
-                  class="table-row"
+                  class="law-index__table-row"
                   v-for="(legislation, legislation_index) in access
-                    .legislation.criteria"
+                      .legislation.criteria"
                   :key="legislation_index"
                 >
-                  <div class="table-column first-column__dropdown-content">
+                  <div
+                    class="law-index__table-column first-column__dropdown-content"
+                  >
                     {{ legislation.cat }} {{ legislation.criterion }}
                   </div>
-                  <div class="table-column second-column__dropdown-content">{{ legislation.comments }}</div>
-                  <div class="table-column sixth-column__main">{{ legislation.score }}</div>
+                  <div
+                    class="law-index__table-column second-column__dropdown-content"
+                  >
+                    {{ legislation.comments }}
+                  </div>
+                  <div class="law-index__table-column last-column__main">
+                    {{ legislation.score }}
+                  </div>
                 </div>
-                <div class="table-row">
-                  <div class="table-column first-column__dropdown-content font-bold">TOTAL</div>
-                  <div class="table-column second-column__dropdown-content">{{ access.legislation.comments }}</div>
-                  <div class="table-column sixth-column__main font-bold">
+                <div class="law-index__table-row">
+                  <div
+                    class="law-index__table-column first-column__dropdown-content law-index__font-bold"
+                  >
+                    TOTAL
+                  </div>
+                  <div
+                    class="law-index__table-column second-column__dropdown-content"
+                  >
+                    {{ access.legislation.comments }}
+                  </div>
+                  <div
+                    class="law-index__table-column last-column__main law-index__font-bold"
+                  >
                     {{ access.legislation.total }}
                   </div>
                 </div>
               </div>
 
-              <div class="dropdown-content">
-                <div class="table-row table-head">
-                  <div class="table-column first-column__dropdown-content">Case Law</div>
-                  <div class="table-column second-column__dropdown-content">
+              <div class="law-index__dropdown-content">
+                <div class="law-index__table-row law-index__table-head">
+                  <div
+                    class="law-index__table-column first-column__dropdown-content"
+                  >
+                    Case Law
+                  </div>
+                  <div
+                    class="law-index__table-column second-column__dropdown-content"
+                  >
                     <a :href="access.caseLaw.website" target="_blank">
                       Description
                     </a>
                   </div>
-                  <div class="table-column sixth-column__main">Points</div>
+                  <div class="law-index__table-column last-column__main">
+                    Points
+                  </div>
                 </div>
                 <div
-                  class="table-row"
+                  class="law-index__table-row"
                   v-for="(caseLaw, caseLaw_index) in access
-                    .caseLaw.criteria"
+                      .caseLaw.criteria"
                   :key="caseLaw_index"
                 >
-                  <div class="table-column first-column__dropdown-content">{{ caseLaw.cat }} {{ caseLaw.criterion }}</div>
-                  <div class="table-column second-column__dropdown-content">{{ caseLaw.comments }}</div>
-                  <div class="table-column sixth-column__main">{{ caseLaw.score }}</div>
+                  <div
+                    class="law-index__table-column first-column__dropdown-content"
+                  >
+                    {{ caseLaw.cat }} {{ caseLaw.criterion }}
+                  </div>
+                  <div
+                    class="law-index__table-column second-column__dropdown-content"
+                  >
+                    {{ caseLaw.comments }}
+                  </div>
+                  <div class="law-index__table-column last-column__main">
+                    {{ caseLaw.score }}
+                  </div>
                 </div>
-                <div class="table-row">
-                  <div class="table-column first-column__dropdown-content font-bold">TOTAL</div>
-                  <div class="table-column second-column__dropdown-content">{{ access.caseLaw.comments }}</div>
-                  <div class="table-column sixth-column__main font-bold">
+                <div class="law-index__table-row">
+                  <div
+                    class="law-index__table-column first-column__dropdown-content law-index__font-bold"
+                  >
+                    TOTAL
+                  </div>
+                  <div
+                    class="law-index__table-column second-column__dropdown-content"
+                  >
+                    {{ access.caseLaw.comments }}
+                  </div>
+                  <div
+                    class="law-index__table-column last-column__main law-index__font-bold"
+                  >
                     {{ access.caseLaw.total }}
                   </div>
                 </div>
               </div>
 
-              <div class="dropdown-content">
-                <div class="table-row table-head">
-                  <div class="table-column first-column__dropdown-content">Gazettes</div>
-                  <div class="table-column second-column__dropdown-content">
+              <div class="law-index__dropdown-content">
+                <div class="law-index__table-row law-index__table-head">
+                  <div
+                    class="law-index__table-column first-column__dropdown-content"
+                  >
+                    Gazettes
+                  </div>
+                  <div
+                    class="law-index__table-column second-column__dropdown-content"
+                  >
                     <a :href="access.gazette.website" target="_blank">
                       Description
                     </a>
                   </div>
-                  <div class="table-column sixth-column__main">Points</div>
+                  <div class="law-index__table-column last-column__main">
+                    Points
+                  </div>
                 </div>
                 <div
-                  class="table-row"
+                  class="law-index__table-row"
                   v-for="(gazette, gazette_index) in access
-                    .gazette.criteria"
+                      .gazette.criteria"
                   :key="gazette_index"
                 >
-                  <div class="table-column first-column__dropdown-content">{{ gazette.cat }} {{ gazette.criterion }}</div>
-                  <div class="table-column second-column__dropdown-content">{{ gazette.comments }}</div>
-                  <div class="table-column sixth-column__main">{{ gazette.score }}</div>
+                  <div
+                    class="law-index__table-column first-column__dropdown-content"
+                  >
+                    {{ gazette.cat }} {{ gazette.criterion }}
+                  </div>
+                  <div
+                    class="law-index__table-column second-column__dropdown-content"
+                  >
+                    {{ gazette.comments }}
+                  </div>
+                  <div class="law-index__table-column last-column__main">
+                    {{ gazette.score }}
+                  </div>
                 </div>
-                <div class="table-row">
-                  <div class="table-column first-column__dropdown-content font-bold">TOTAL</div>
-                  <div class="table-column second-column__dropdown-content">{{ access.gazette.comments }}</div>
-                  <div class="table-column sixth-column__main font-bold">
+                <div class="law-index__table-row">
+                  <div
+                    class="law-index__table-column first-column__dropdown-content law-index__font-bold"
+                  >
+                    TOTAL
+                  </div>
+                  <div
+                    class="law-index__table-column second-column__dropdown-content"
+                  >
+                    {{ access.gazette.comments }}
+                  </div>
+                  <div
+                    class="law-index__table-column last-column__main law-index__font-bold"
+                  >
                     {{ access.gazette.total }}
                   </div>
                 </div>
@@ -156,7 +277,7 @@ const africanLawIndex = createApp({
       this.lawIndex = this.sortByColumn();
     },
   },
-  mounted() {
+  created() {
     this.fetchLawIndex();
   },
   methods: {
@@ -170,7 +291,7 @@ const africanLawIndex = createApp({
       if (response.ok) {
         const json = this.convertToJson(await response.text());
         this.lawIndex = this.formatLawIndex(json);
-        this.updateSortValue('rank')
+        this.updateSortValue("rank");
         this.loading = false;
       } else {
         this.loading = false;
@@ -189,14 +310,19 @@ const africanLawIndex = createApp({
       });
     },
     findDataPerKey(arr, value, key) {
-      const foundArr = arr.find((obj) => obj.Cat == value);
+      // This finds the relevant data per key in the json ouput.
+      // It takes in an integer or string value of the category, e.g., 1 or "1.2".
+      // If the key exists in the json output, it reurns the property value
+      // and if not, it returns an empty string.
+
+      const foundArr = arr.find((obj) => obj.Cat === String(value));
       return foundArr[key] || "";
     },
     formatLawIndex(arr) {
-      // We need to format our jsonOutput so that it's readable and more structured.
+      // We need to format our json output so that it's readable and more structured.
       // This helps us populate the table easily.
 
-      // The goal is to sort jsonOutput per country
+      // The goal is to sort json output per country
       // so that each array element contains all relvant info about the specified country.
 
       const countries = Object.keys(arr[0]).filter(
@@ -227,14 +353,17 @@ const africanLawIndex = createApp({
       }));
     },
     formatAccordionData(arr, filterValue, country) {
-      const objToReturn = {};
-      objToReturn.criteria = arr
+      // We format each of legislation, case law and gazette to have its category,
+      // website, criterion, comments and score peculiar to a specified country.
+      
+      const accordionData = {};
+      accordionData.criteria = arr
         .filter((el, index) => {
           if (
             el.Cat.startsWith(filterValue) &&
             arr[index - 1].Cat === "Website"
           ) {
-            objToReturn.website = arr[index - 1][country];
+            accordionData.website = arr[index - 1][country];
           }
           return el.Cat.startsWith(filterValue);
         })
@@ -247,19 +376,19 @@ const africanLawIndex = createApp({
           };
           return criterionData;
         });
-      objToReturn.total = parseInt(
+      accordionData.total = parseInt(
         this.findDataPerKey(arr, parseInt(filterValue), country)
       );
-      objToReturn.points = parseInt(
+      accordionData.points = parseInt(
         this.findDataPerKey(arr, parseInt(filterValue), "points")
       );
-      objToReturn.comments = this.findDataPerKey(
+      accordionData.comments = this.findDataPerKey(
         arr,
         parseInt(filterValue),
         "Comments"
       );
 
-      return objToReturn;
+      return accordionData;
     },
     updateSortValue(field) {
       let sortValue;
@@ -302,9 +431,9 @@ const africanLawIndex = createApp({
             }
 
             if (this.currentSortValue[key] === "asc") {
-              return String(fieldA).localeCompare(String(fieldB));
+              return String(fieldA).localeCompare(String(fieldB), undefined, { numeric: true });
             } else if (this.currentSortValue[key] === "desc") {
-              return String(fieldB).localeCompare(String(fieldA));
+              return String(fieldB).localeCompare(String(fieldA), undefined, { numeric: true });
             }
           });
         }
