@@ -10,7 +10,7 @@ const africanLawIndex = createApp({
       An error occured while loading the data. Please try again later.
     </div>
 
-    <div v-else>
+    <div class="law-index__table" v-else>
       <div class="law-index__table-row law-index__table-head">
         <div
           class="law-index__table-column first-column__main law-index__pointer"
@@ -454,6 +454,7 @@ const africanLawIndex = createApp({
         dropdown.style.maxHeight = null;
       } else {
         dropdown.style.maxHeight = dropdown.scrollHeight + "px";
+        dropdown.style.minWidth = dropdown.parentElement.scrollWidth + "px";
       }
     },
   },
