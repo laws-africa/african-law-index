@@ -1,6 +1,4 @@
-const { createApp } = Vue;
-
-const africanLawIndex = createApp({
+const africanLawIndex = Vue.createApp({
   template: `<div class="law-index__container">
     <div v-if="loading" class="law-index__center-align">
       <div class="law-index__spinner" role="status"></div>
