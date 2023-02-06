@@ -24,33 +24,33 @@ const africanLawIndex = Vue.createApp({
         </div>
         <div
           class="law-index__table-column third-column__main law-index__pointer"
+          @click="updateSortValue('score')"
+        >
+          Score <span v-html="displayArrow('score')"></span>
+        </div>
+        <div
+          class="law-index__table-column fourth-column__main law-index__pointer"
           @click="updateSortValue('legislation')"
         >
           Legislation <span v-html="displayArrow('legislation')"></span>
         </div>
         <div
-          class="law-index__table-column fourth-column__main law-index__pointer"
+          class="law-index__table-column fifth-column__main law-index__pointer"
           @click="updateSortValue('caseLaw')"
         >
           Case Law <span v-html="displayArrow('caseLaw')"></span>
         </div>
         <div
-          class="law-index__table-column fifth-column__main law-index__pointer"
+          class="law-index__table-column last-column__main law-index__pointer"
           @click="updateSortValue('gazette')"
         >
           Gazettes <span v-html="displayArrow('gazette')"></span>
-        </div>
-        <div
-          class="law-index__table-column last-column__main law-index__pointer"
-          @click="updateSortValue('score')"
-        >
-          Score <span v-html="displayArrow('score')"></span>
         </div>
       </div>
       <div v-for="(access, access_index) in lawIndex" :key="access_index">
         <div
           class="law-index__table-row law-index__pointer"
-          @click="(e) => toggleAccordion(e, access.location)"
+          @click="(e) => toggleAccordion(e, access_index)"
         >
           <div class="law-index__table-column first-column__main">
             {{ access.rank }}
@@ -59,22 +59,22 @@ const africanLawIndex = Vue.createApp({
             {{ access.location }}
           </div>
           <div class="law-index__table-column third-column__main">
-            {{ Math.floor((access.legislation.total * 100) / access.legislation.points) }}%
+            {{ Math.floor(access.score) }}%
           </div>
           <div class="law-index__table-column fourth-column__main">
-            {{ Math.floor((access.caseLaw.total * 100) / access.caseLaw.points) }}%
+            {{ Math.floor((access.legislation.total * 100) / access.legislation.points) }}%
           </div>
           <div class="law-index__table-column fifth-column__main">
-            {{ Math.floor((access.gazette.total * 100) / access.gazette.points) }}%
+            {{ Math.floor((access.caseLaw.total * 100) / access.caseLaw.points) }}%
           </div>
           <div class="law-index__table-column last-column__main">
-            {{ Math.floor(access.score) }}%
+            {{ Math.floor((access.gazette.total * 100) / access.gazette.points) }}%
           </div>
         </div>
 
         <div
           class="law-index__dropdown law-index__table-row"
-          :id="access.location"
+          :id="'table-row__' + access_index"
         >
           <div class="law-index__table-column first-column__main"></div>
           <div class="law-index__table-column second-column__dropdown">
@@ -345,15 +345,23 @@ const africanLawIndex = Vue.createApp({
           190;
         return dataPerCountry;
       });
-      return this.sortByColumn(unsortedLawIndex).map((countryData, index) => ({
+
+      const sortedLawIndex = this.sortByColumn(unsortedLawIndex);
+
+      return sortedLawIndex.map((countryData, index) => ({
         ...countryData,
-        rank: index + 1,
+        rank:
+          index > 0 && sortedLawIndex[index - 1].score === countryData.score
+            ? sortedLawIndex.findIndex(
+                (lawIndex) => lawIndex.score === countryData.score
+              ) + 1
+            : index + 1,
       }));
     },
     formatAccordionData(arr, filterValue, country) {
       // We format each of legislation, case law and gazette to have its category,
       // website, criterion, comments and score peculiar to a specified country.
-      
+
       const accordionData = {};
       accordionData.criteria = arr
         .filter((el, index) => {
@@ -429,9 +437,13 @@ const africanLawIndex = Vue.createApp({
             }
 
             if (this.currentSortValue[key] === "asc") {
-              return String(fieldA).localeCompare(String(fieldB), undefined, { numeric: true });
+              return String(fieldA).localeCompare(String(fieldB), undefined, {
+                numeric: true,
+              });
             } else if (this.currentSortValue[key] === "desc") {
-              return String(fieldB).localeCompare(String(fieldA), undefined, { numeric: true });
+              return String(fieldB).localeCompare(String(fieldA), undefined, {
+                numeric: true,
+              });
             }
           });
         }
@@ -445,8 +457,8 @@ const africanLawIndex = Vue.createApp({
         return "<span>&darr;</span>";
       else return "";
     },
-    toggleAccordion(e, location) {
-      const dropdown = document.querySelector(`#${location}`);
+    toggleAccordion(e, index) {
+      const dropdown = document.querySelector(`#table-row__${index}`);
 
       if (dropdown.style.maxHeight) {
         dropdown.style.maxHeight = null;
