@@ -1,7 +1,12 @@
 .law-index__table-column {
-    padding: 0.5em 1em;
+    padding: 0.5em;
     border: 1px solid gray;
     border-collapse: collapse;
+    min-width: 90px;
+}
+
+.first-column__main {
+    min-width: 50px;
 }
 
 .law-index__pointer {
@@ -18,7 +23,7 @@
 }
 
 .law-index__table {
-    overflow: scroll;
+    overflow-x: scroll;
 }
 
 .law-index__table-row {
