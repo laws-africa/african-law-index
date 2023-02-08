@@ -49,7 +49,7 @@ const africanLawIndex = Vue.createApp({
       </div>
       <div v-for="(access, access_index) in lawIndex" :key="access_index">
         <div
-          class="law-index__table-row law-index__pointer"
+          class="law-index__table-row law-index_table-accordion law-index__pointer"
           @click="(e) => toggleAccordion(e, access_index)"
         >
           <div class="law-index__table-column first-column__main">
