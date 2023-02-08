@@ -132,7 +132,7 @@ const africanLawIndex = Vue.createApp({
                   <div
                     class="law-index__table-column last-column__main law-index__font-bold"
                   >
-                    {{ access.legislation.total }}
+                    {{ access.legislation.total }} out of {{access.legislation.points}}
                   </div>
                 </div>
               </div>
@@ -189,7 +189,7 @@ const africanLawIndex = Vue.createApp({
                   <div
                     class="law-index__table-column last-column__main law-index__font-bold"
                   >
-                    {{ access.caseLaw.total }}
+                    {{ access.caseLaw.total }} out of {{access.caseLaw.points}}
                   </div>
                 </div>
               </div>
@@ -246,7 +246,7 @@ const africanLawIndex = Vue.createApp({
                   <div
                     class="law-index__table-column last-column__main law-index__font-bold"
                   >
-                    {{ access.gazette.total }}
+                    {{ access.gazette.total }} out of {{access.gazette.points}}
                   </div>
                 </div>
               </div>
@@ -337,12 +337,18 @@ const africanLawIndex = Vue.createApp({
           caseLaw: this.formatAccordionData(arr, "2.", country),
           gazette: this.formatAccordionData(arr, "3.", country),
         };
+
+        const totalPoints =
+          dataPerCountry.legislation.points +
+          dataPerCountry.caseLaw.points +
+          dataPerCountry.gazette.points;
+
         dataPerCountry.score =
           ((dataPerCountry.legislation.total +
             dataPerCountry.caseLaw.total +
             dataPerCountry.gazette.total) *
             100) /
-          190;
+          totalPoints;
         return dataPerCountry;
       });
 
