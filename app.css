@@ -13,8 +13,13 @@
     cursor: pointer;
 }
 
-.law-index__table-head .law-index__table-column {
+.law-index__table-head .law-index__table-column:nth-child(-n+3) {
     background-color: rgb(41,51,92);
+    color: #FFFFFF;
+}
+
+.law-index__table-head .law-index__table-column:nth-last-child(-n+3) {
+    background-color: rgb(61,76,138);
     color: #FFFFFF;
 }
 
