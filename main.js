@@ -468,7 +468,9 @@ const africanLawIndex = Vue.createApp({
 
       if (dropdown.style.maxHeight) {
         dropdown.style.maxHeight = null;
+        dropdown.parentNode.classList.remove('active')
       } else {
+        dropdown.parentNode.classList.add('active')
         dropdown.style.maxHeight = dropdown.scrollHeight + "px";
         dropdown.style.minWidth = dropdown.parentElement.scrollWidth + "px";
       }
