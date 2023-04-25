@@ -82,7 +82,7 @@ const africanLawIndex = Vue.createApp({
         <div class="law-index__table-column first-column__main"></div>
         <div class="law-index__table-column second-column__dropdown">
           <div>
-            <div>{{ access.location }}</div>
+            <div><b>{{ access.location }}</b></div>
             <div class="law-index__dropdown-content">
               <div class="law-index__table-row law-index__table-head">
                 <div
