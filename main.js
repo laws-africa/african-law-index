@@ -1,253 +1,312 @@
 const africanLawIndex = Vue.createApp({
   template: `<div class="law-index__container">
-    <div v-if="loading" class="law-index__center-align">
-      <div class="law-index__spinner" role="status"></div>
-    </div>
+  <div v-if="loading" class="law-index__center-align">
+    <div class="law-index__spinner" role="status"></div>
+  </div>
 
-    <div class="law-index__center-align" v-else-if="!loading && !status">
-      An error occured while loading the data. Please try again later.
-    </div>
+  <div class="law-index__center-align" v-else-if="!loading && !status">
+    An error occured while loading the data. Please try again later.
+  </div>
 
-    <div class="law-index__table" v-else>
-      <div class="law-index__table-row law-index__table-head">
-        <div
-          class="law-index__table-column first-column__main law-index__pointer"
-          @click="updateSortValue('rank')"
-        >
-          Rank <span v-html="displayArrow('rank')"></span>
+  <div class="law-index__table" v-else>
+    <div class="law-index__table-row law-index__table-head">
+      <div
+        class="law-index__table-column first-column__main law-index__pointer"
+        @click="updateSortValue('rank')"
+      >
+        Rank <span v-html="displayArrow('rank')"></span>
+      </div>
+      <div
+        class="law-index__table-column second-column__main law-index__pointer"
+        @click="updateSortValue('location')"
+      >
+        Place <span v-html="displayArrow('location')"></span>
+      </div>
+      <div
+        class="law-index__table-column third-column__main law-index__pointer"
+        @click="updateSortValue('score')"
+      >
+        Score <span v-html="displayArrow('score')"></span>
+      </div>
+      <div
+        class="law-index__table-column fourth-column__main law-index__pointer"
+        @click="updateSortValue('legislation')"
+      >
+        Legislation <span v-html="displayArrow('legislation')"></span>
+      </div>
+      <div
+        class="law-index__table-column fifth-column__main law-index__pointer"
+        @click="updateSortValue('caseLaw')"
+      >
+        Case Law <span v-html="displayArrow('caseLaw')"></span>
+      </div>
+      <div
+        class="law-index__table-column last-column__main law-index__pointer"
+        @click="updateSortValue('gazette')"
+      >
+        Gazettes <span v-html="displayArrow('gazette')"></span>
+      </div>
+    </div>
+    <div v-for="(access, access_index) in lawIndex" :key="access_index">
+      <div
+        class="law-index__table-row law-index_table-accordion law-index__pointer"
+        @click="(e) => toggleAccordion(e, access_index)"
+      >
+        <div class="law-index__table-column first-column__main">
+          {{ access.rank }}
         </div>
-        <div
-          class="law-index__table-column second-column__main law-index__pointer"
-          @click="updateSortValue('location')"
-        >
-          Place <span v-html="displayArrow('location')"></span>
+        <div class="law-index__table-column second-column__main">
+          {{ access.location }}
         </div>
-        <div
-          class="law-index__table-column third-column__main law-index__pointer"
-          @click="updateSortValue('score')"
-        >
-          Score <span v-html="displayArrow('score')"></span>
+        <div class="law-index__table-column third-column__main">
+          {{ Math.floor(access.score) }}%
         </div>
-        <div
-          class="law-index__table-column fourth-column__main law-index__pointer"
-          @click="updateSortValue('legislation')"
-        >
-          Legislation <span v-html="displayArrow('legislation')"></span>
+        <div class="law-index__table-column fourth-column__main">
+          {{ Math.floor((access.legislation.total * 100) /
+          access.legislation.points) }}%
         </div>
-        <div
-          class="law-index__table-column fifth-column__main law-index__pointer"
-          @click="updateSortValue('caseLaw')"
-        >
-          Case Law <span v-html="displayArrow('caseLaw')"></span>
+        <div class="law-index__table-column fifth-column__main">
+          {{ Math.floor((access.caseLaw.total * 100) / access.caseLaw.points)
+          }}%
         </div>
-        <div
-          class="law-index__table-column last-column__main law-index__pointer"
-          @click="updateSortValue('gazette')"
-        >
-          Gazettes <span v-html="displayArrow('gazette')"></span>
+        <div class="law-index__table-column last-column__main">
+          {{ Math.floor((access.gazette.total * 100) / access.gazette.points)
+          }}%
         </div>
       </div>
-      <div v-for="(access, access_index) in lawIndex" :key="access_index">
-        <div
-          class="law-index__table-row law-index_table-accordion law-index__pointer"
-          @click="(e) => toggleAccordion(e, access_index)"
-        >
-          <div class="law-index__table-column first-column__main">
-            {{ access.rank }}
-          </div>
-          <div class="law-index__table-column second-column__main">
-            {{ access.location }}
-          </div>
-          <div class="law-index__table-column third-column__main">
-            {{ Math.floor(access.score) }}%
-          </div>
-          <div class="law-index__table-column fourth-column__main">
-            {{ Math.floor((access.legislation.total * 100) / access.legislation.points) }}%
-          </div>
-          <div class="law-index__table-column fifth-column__main">
-            {{ Math.floor((access.caseLaw.total * 100) / access.caseLaw.points) }}%
-          </div>
-          <div class="law-index__table-column last-column__main">
-            {{ Math.floor((access.gazette.total * 100) / access.gazette.points) }}%
-          </div>
-        </div>
 
-        <div
-          class="law-index__dropdown law-index__table-row"
-          :id="'table-row__' + access_index"
-        >
-          <div class="law-index__table-column first-column__main"></div>
-          <div class="law-index__table-column second-column__dropdown">
-            <div>
-              <div>{{ access.location }}</div>
-              <div class="law-index__dropdown-content">
-                <div class="law-index__table-row law-index__table-head">
-                  <div
-                    class="law-index__table-column first-column__dropdown-content"
-                  >
-                    Legislation
-                  </div>
-                  <div
-                    class="law-index__table-column second-column__dropdown-content"
-                  >
-                    <a :href="access.legislation.website" target="_blank">
-                      Description
-                    </a>
-                  </div>
-                  <div class="law-index__table-column last-column__main">
-                    Points
-                  </div>
+      <div
+        class="law-index__dropdown law-index__table-row"
+        :id="'table-row__' + access_index"
+      >
+        <div class="law-index__table-column first-column__main"></div>
+        <div class="law-index__table-column second-column__dropdown">
+          <div>
+            <div>{{ access.location }}</div>
+            <div class="law-index__dropdown-content">
+              <div class="law-index__table-row law-index__table-head">
+                <div
+                  class="law-index__table-column first-column__dropdown-content"
+                >
+                  Legislation
                 </div>
                 <div
-                  class="law-index__table-row"
-                  v-for="(legislation, legislation_index) in access
-                      .legislation.criteria"
-                  :key="legislation_index"
+                  class="law-index__table-column second-column__dropdown-content"
                 >
-                  <div
-                    class="law-index__table-column first-column__dropdown-content"
-                  >
-                    {{ legislation.cat }} {{ legislation.criterion }}
-                  </div>
-                  <div
-                    class="law-index__table-column second-column__dropdown-content"
-                  >
-                    {{ legislation.comments }}
-                  </div>
-                  <div class="law-index__table-column last-column__main">
-                    {{ legislation.score }}
-                  </div>
+                  Description
                 </div>
-                <div class="law-index__table-row">
-                  <div
-                    class="law-index__table-column first-column__dropdown-content law-index__font-bold"
-                  >
-                    TOTAL
-                  </div>
-                  <div
-                    class="law-index__table-column second-column__dropdown-content"
-                  >
-                    {{ access.legislation.comments }}
-                  </div>
-                  <div
-                    class="law-index__table-column last-column__main law-index__font-bold"
-                  >
-                    {{ access.legislation.total }} out of {{access.legislation.points}}
-                  </div>
+                <div class="law-index__table-column last-column__main">
+                  Points
                 </div>
               </div>
 
-              <div class="law-index__dropdown-content">
-                <div class="law-index__table-row law-index__table-head">
-                  <div
-                    class="law-index__table-column first-column__dropdown-content"
-                  >
-                    Case Law
-                  </div>
-                  <div
-                    class="law-index__table-column second-column__dropdown-content"
-                  >
-                    <a :href="access.caseLaw.website" target="_blank">
-                      Description
-                    </a>
-                  </div>
-                  <div class="law-index__table-column last-column__main">
-                    Points
-                  </div>
+              <div class="law-index__table-row">
+                <div
+                  class="law-index__table-column first-column__dropdown-content"
+                >
+                  Website
                 </div>
                 <div
-                  class="law-index__table-row"
-                  v-for="(caseLaw, caseLaw_index) in access
-                      .caseLaw.criteria"
-                  :key="caseLaw_index"
+                  class="law-index__table-column second-column__dropdown-content"
                 >
                   <div
-                    class="law-index__table-column first-column__dropdown-content"
+                    v-for="(website, website_index) in access.legislation.websites"
+                    :key="website_index"
                   >
-                    {{ caseLaw.cat }} {{ caseLaw.criterion }}
-                  </div>
-                  <div
-                    class="law-index__table-column second-column__dropdown-content"
-                  >
-                    {{ caseLaw.comments }}
-                  </div>
-                  <div class="law-index__table-column last-column__main">
-                    {{ caseLaw.score }}
+                    <a :href="updateUrl(website)" target="_blank">
+                      {{ website}}
+                    </a>
                   </div>
                 </div>
-                <div class="law-index__table-row">
-                  <div
-                    class="law-index__table-column first-column__dropdown-content law-index__font-bold"
-                  >
-                    TOTAL
-                  </div>
-                  <div
-                    class="law-index__table-column second-column__dropdown-content"
-                  >
-                    {{ access.caseLaw.comments }}
-                  </div>
-                  <div
-                    class="law-index__table-column last-column__main law-index__font-bold"
-                  >
-                    {{ access.caseLaw.total }} out of {{access.caseLaw.points}}
-                  </div>
+                <div class="law-index__table-column last-column__main"></div>
+              </div>
+
+              <div
+                class="law-index__table-row"
+                v-for="(legislation, legislation_index) in access.legislation.criteria"
+                :key="legislation_index"
+              >
+                <div
+                  class="law-index__table-column first-column__dropdown-content"
+                >
+                  {{ legislation.cat }} {{ legislation.criterion }}
+                </div>
+                <div
+                  class="law-index__table-column second-column__dropdown-content"
+                >
+                  {{ legislation.comments }}
+                </div>
+                <div class="law-index__table-column last-column__main">
+                  {{ legislation.score }}
+                </div>
+              </div>
+              <div class="law-index__table-row">
+                <div
+                  class="law-index__table-column first-column__dropdown-content law-index__font-bold"
+                >
+                  TOTAL
+                </div>
+                <div
+                  class="law-index__table-column second-column__dropdown-content"
+                >
+                  {{ access.legislation.comments }}
+                </div>
+                <div
+                  class="law-index__table-column last-column__main law-index__font-bold"
+                >
+                  {{ access.legislation.total }} out of
+                  {{access.legislation.points}}
+                </div>
+              </div>
+            </div>
+
+            <div class="law-index__dropdown-content">
+              <div class="law-index__table-row law-index__table-head">
+                <div
+                  class="law-index__table-column first-column__dropdown-content"
+                >
+                  Case Law
+                </div>
+                <div
+                  class="law-index__table-column second-column__dropdown-content"
+                >
+                  Description
+                </div>
+                <div class="law-index__table-column last-column__main">
+                  Points
                 </div>
               </div>
 
-              <div class="law-index__dropdown-content">
-                <div class="law-index__table-row law-index__table-head">
-                  <div
-                    class="law-index__table-column first-column__dropdown-content"
-                  >
-                    Gazettes
-                  </div>
-                  <div
-                    class="law-index__table-column second-column__dropdown-content"
-                  >
-                    <a :href="access.gazette.website" target="_blank">
-                      Description
-                    </a>
-                  </div>
-                  <div class="law-index__table-column last-column__main">
-                    Points
-                  </div>
+              <div class="law-index__table-row">
+                <div
+                  class="law-index__table-column first-column__dropdown-content"
+                >
+                  Website
                 </div>
                 <div
-                  class="law-index__table-row"
-                  v-for="(gazette, gazette_index) in access
-                      .gazette.criteria"
-                  :key="gazette_index"
+                  class="law-index__table-column second-column__dropdown-content"
                 >
                   <div
-                    class="law-index__table-column first-column__dropdown-content"
+                    v-for="(website, website_index) in access.caseLaw.websites"
+                    :key="website_index"
                   >
-                    {{ gazette.cat }} {{ gazette.criterion }}
-                  </div>
-                  <div
-                    class="law-index__table-column second-column__dropdown-content"
-                  >
-                    {{ gazette.comments }}
-                  </div>
-                  <div class="law-index__table-column last-column__main">
-                    {{ gazette.score }}
+                    <a :href="updateUrl(website)" target="_blank">
+                      {{ website}}
+                    </a>
                   </div>
                 </div>
-                <div class="law-index__table-row">
+                <div class="law-index__table-column last-column__main"></div>
+              </div>
+              <div
+                class="law-index__table-row"
+                v-for="(caseLaw, caseLaw_index) in access.caseLaw.criteria"
+                :key="caseLaw_index"
+              >
+                <div
+                  class="law-index__table-column first-column__dropdown-content"
+                >
+                  {{ caseLaw.cat }} {{ caseLaw.criterion }}
+                </div>
+                <div
+                  class="law-index__table-column second-column__dropdown-content"
+                >
+                  {{ caseLaw.comments }}
+                </div>
+                <div class="law-index__table-column last-column__main">
+                  {{ caseLaw.score }}
+                </div>
+              </div>
+              <div class="law-index__table-row">
+                <div
+                  class="law-index__table-column first-column__dropdown-content law-index__font-bold"
+                >
+                  TOTAL
+                </div>
+                <div
+                  class="law-index__table-column second-column__dropdown-content"
+                >
+                  {{ access.caseLaw.comments }}
+                </div>
+                <div
+                  class="law-index__table-column last-column__main law-index__font-bold"
+                >
+                  {{ access.caseLaw.total }} out of {{access.caseLaw.points}}
+                </div>
+              </div>
+            </div>
+
+            <div class="law-index__dropdown-content">
+              <div class="law-index__table-row law-index__table-head">
+                <div
+                  class="law-index__table-column first-column__dropdown-content"
+                >
+                  Gazettes
+                </div>
+                <div
+                  class="law-index__table-column second-column__dropdown-content"
+                >
+                  Description
+                </div>
+                <div class="law-index__table-column last-column__main">
+                  Points
+                </div>
+              </div>
+
+              <div class="law-index__table-row">
+                <div
+                  class="law-index__table-column first-column__dropdown-content"
+                >
+                  Website
+                </div>
+                <div
+                  class="law-index__table-column second-column__dropdown-content"
+                >
                   <div
-                    class="law-index__table-column first-column__dropdown-content law-index__font-bold"
+                    v-for="(website, website_index) in access.gazette.websites"
+                    :key="website_index"
                   >
-                    TOTAL
+                    <a :href="updateUrl(website)" target="_blank">
+                      {{ website}}
+                    </a>
                   </div>
-                  <div
-                    class="law-index__table-column second-column__dropdown-content"
-                  >
-                    {{ access.gazette.comments }}
-                  </div>
-                  <div
-                    class="law-index__table-column last-column__main law-index__font-bold"
-                  >
-                    {{ access.gazette.total }} out of {{access.gazette.points}}
-                  </div>
+                </div>
+                <div class="law-index__table-column last-column__main"></div>
+              </div>
+
+              <div
+                class="law-index__table-row"
+                v-for="(gazette, gazette_index) in access.gazette.criteria"
+                :key="gazette_index"
+              >
+                <div
+                  class="law-index__table-column first-column__dropdown-content"
+                >
+                  {{ gazette.cat }} {{ gazette.criterion }}
+                </div>
+                <div
+                  class="law-index__table-column second-column__dropdown-content"
+                >
+                  {{ gazette.comments }}
+                </div>
+                <div class="law-index__table-column last-column__main">
+                  {{ gazette.score }}
+                </div>
+              </div>
+              <div class="law-index__table-row">
+                <div
+                  class="law-index__table-column first-column__dropdown-content law-index__font-bold"
+                >
+                  TOTAL
+                </div>
+                <div
+                  class="law-index__table-column second-column__dropdown-content"
+                >
+                  {{ access.gazette.comments }}
+                </div>
+                <div
+                  class="law-index__table-column last-column__main law-index__font-bold"
+                >
+                  {{ access.gazette.total }} out of {{access.gazette.points}}
                 </div>
               </div>
             </div>
@@ -255,7 +314,9 @@ const africanLawIndex = Vue.createApp({
         </div>
       </div>
     </div>
-  </div>`,
+  </div>
+</div>
+`,
   data() {
     return {
       lawIndex: [],
@@ -375,7 +436,7 @@ const africanLawIndex = Vue.createApp({
             el.Cat.startsWith(filterValue) &&
             arr[index - 1].Cat === "Website"
           ) {
-            accordionData.website = arr[index - 1][country];
+            accordionData.websites = arr[index - 1][country]?.split("|");
           }
           return el.Cat.startsWith(filterValue);
         })
@@ -468,12 +529,18 @@ const africanLawIndex = Vue.createApp({
 
       if (dropdown.style.maxHeight) {
         dropdown.style.maxHeight = null;
-        dropdown.parentNode.classList.remove('active')
+        dropdown.parentNode.classList.remove("active");
       } else {
-        dropdown.parentNode.classList.add('active')
+        dropdown.parentNode.classList.add("active");
         dropdown.style.maxHeight = dropdown.scrollHeight + "px";
         dropdown.style.minWidth = dropdown.parentElement.scrollWidth + "px";
       }
+    },
+
+    updateUrl(url) {
+      if (!url) return
+      if (url.startsWith("http") || url.startsWith("https")) return url;
+      return "http://" + url;
     },
   },
 });
