@@ -88,7 +88,7 @@
 }
 
 .law-index_table-accordion:hover, .active {
-    background-color: #efefef;
+    background-color: #e8e8e8;
 }
 
 .law-index__spinner {
@@ -119,7 +119,7 @@
 }
 
 .law-index__table-column a {
-    color: inherit;
+    color: #1a0dab;
 }
 
 .law-index__table::-webkit-scrollbar {
