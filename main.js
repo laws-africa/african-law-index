@@ -342,13 +342,14 @@ const africanLawIndex = Vue.createApp({
   methods: {
     async fetchLawIndex() {
       const response = await fetch(
-        "https://docs.google.com/spreadsheets/d/e/2PACX-1vToqs8Oyz-t2FyHSHAmoqBvFiaR90j2L0XRysS_Wc7IaK6ZVdEhWRDo_jFJNdLqS-1W-OS00UxmLsCg/pub?gid=1585265851&single=true&output=csv"
+        "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgqwpUPf25oEk6nge9wjiE8j8hNz1YNSq8xjdJT-soQkG4cfdy0eDpYcI-VFjk5Q1TkYk0UiUtEIdu/pub?gid=619601361&single=true&output=csv"
       );
 
       this.status = response.ok;
 
       if (response.ok) {
-        const json = this.convertToJson(await response.text());
+        const responseText = await response.text();
+        const json = this.convertToJson(responseText);
         this.lawIndex = this.formatLawIndex(json);
         this.updateSortValue("rank");
         this.loading = false;
@@ -364,7 +365,10 @@ const africanLawIndex = Vue.createApp({
       const keys = data.shift();
       return data.map((value) => {
         const keyValuePair = {};
-        keys.map((key, i) => (keyValuePair[key] = value[i]));
+        keys.map((key, i) => {
+          const validKey = key || `${keys[[i - 1]]}_score`;
+          return (keyValuePair[validKey] = value[i]);
+        });
         return keyValuePair;
       });
     },
@@ -386,32 +390,42 @@ const africanLawIndex = Vue.createApp({
 
       const countries = Object.keys(arr[0]).filter(
         (key) =>
+          key &&
           key !== "Cat" &&
           key !== "Criterion" &&
           key !== "Comments" &&
-          key !== "points"
+          key !== "points" &&
+          !key.includes("score")
       );
-      const unsortedLawIndex = countries.map((country, index) => {
+
+      const unsortedLawIndex = [];
+      for (let i=0; i < countries.length; i++) {
         const dataPerCountry = {
-          location: country,
-          legislation: this.formatAccordionData(arr, "1.", country),
-          caseLaw: this.formatAccordionData(arr, "2.", country),
-          gazette: this.formatAccordionData(arr, "3.", country),
+          location: countries[i],
+          legislation: this.formatAccordionData(arr, "1.", countries[i]),
+          caseLaw: this.formatAccordionData(arr, "2.", countries[i]),
+          gazette: this.formatAccordionData(arr, "3.", countries[i]),
         };
 
-        const totalPoints =
-          dataPerCountry.legislation.points +
-          dataPerCountry.caseLaw.points +
-          dataPerCountry.gazette.points;
+        if (
+          dataPerCountry.legislation &&
+          dataPerCountry.caseLaw &&
+          dataPerCountry.gazette
+        ) {
+          const totalPoints =
+            dataPerCountry.legislation.points +
+            dataPerCountry.caseLaw.points +
+            dataPerCountry.gazette.points;
 
-        dataPerCountry.score =
-          ((dataPerCountry.legislation.total +
-            dataPerCountry.caseLaw.total +
-            dataPerCountry.gazette.total) *
-            100) /
-          totalPoints;
-        return dataPerCountry;
-      });
+          dataPerCountry.score =
+            ((dataPerCountry.legislation.total +
+              dataPerCountry.caseLaw.total +
+              dataPerCountry.gazette.total) *
+              100) /
+            totalPoints;
+          unsortedLawIndex.push(dataPerCountry);
+        }
+      }
 
       const sortedLawIndex = this.sortByColumn(unsortedLawIndex);
 
@@ -436,7 +450,8 @@ const africanLawIndex = Vue.createApp({
             el.Cat.startsWith(filterValue) &&
             arr[index - 1].Cat === "Website"
           ) {
-            accordionData.websites = arr[index - 1][country]?.split("|");
+            accordionData.websites =
+              arr[index - 1][`${country}_score`]?.split("|");
           }
           return el.Cat.startsWith(filterValue);
         })
@@ -444,13 +459,13 @@ const africanLawIndex = Vue.createApp({
           const criterionData = {
             cat: obj.Cat,
             criterion: obj.Criterion,
-            comments: obj.Comments,
-            score: obj[country],
+            comments: obj[country],
+            score: obj[`${country}_score`],
           };
           return criterionData;
         });
       accordionData.total = parseInt(
-        this.findDataPerKey(arr, parseInt(filterValue), country)
+        this.findDataPerKey(arr, parseInt(filterValue), `${country}_score`)
       );
       accordionData.points = parseInt(
         this.findDataPerKey(arr, parseInt(filterValue), "points")
@@ -461,6 +476,7 @@ const africanLawIndex = Vue.createApp({
         "Comments"
       );
 
+      if (isNaN(accordionData.total)) return;
       return accordionData;
     },
     updateSortValue(field) {
@@ -538,7 +554,7 @@ const africanLawIndex = Vue.createApp({
     },
 
     updateUrl(url) {
-      if (!url) return
+      if (!url) return;
       if (url.startsWith("http") || url.startsWith("https")) return url;
       return "http://" + url;
     },
