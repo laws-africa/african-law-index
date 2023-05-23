@@ -349,8 +349,8 @@ const africanLawIndex = Vue.createApp({
 
       if (response.ok) {
         const responseText = await response.text();
-        const json = this.convertToJson(responseText);
-        this.lawIndex = this.formatLawIndex(json);
+        const parsedData = Papa.parse(responseText);
+        this.lawIndex = this.formatLawIndex(parsedData.data);
         this.updateSortValue("rank");
         this.loading = false;
       } else {
@@ -378,7 +378,7 @@ const africanLawIndex = Vue.createApp({
       // If the key exists in the json output, it reurns the property value
       // and if not, it returns an empty string.
 
-      const foundArr = arr.find((obj) => obj.Cat === String(value));
+      const foundArr = arr.find((obj) => obj[0] === String(value));
       return foundArr[key] || "";
     },
     formatLawIndex(arr) {
@@ -388,7 +388,7 @@ const africanLawIndex = Vue.createApp({
       // The goal is to sort json output per country
       // so that each array element contains all relvant info about the specified country.
 
-      const countries = Object.keys(arr[0]).filter(
+      const countries = arr[0].filter(
         (key) =>
           key &&
           key !== "Cat" &&
@@ -444,36 +444,37 @@ const africanLawIndex = Vue.createApp({
       // website, criterion, comments and score peculiar to a specified country.
 
       const accordionData = {};
+      const countryIndex = arr[0].indexOf(country)
       accordionData.criteria = arr
         .filter((el, index) => {
           if (
-            el.Cat.startsWith(filterValue) &&
-            arr[index - 1].Cat === "Website"
+            el[0] === "Website" &&
+            arr[index + 1][0].startsWith(filterValue)
           ) {
             accordionData.websites =
-              arr[index - 1][`${country}_score`]?.split("|");
+              el[countryIndex + 1]?.split("|");
           }
-          return el.Cat.startsWith(filterValue);
+          return el[0].startsWith(filterValue);
         })
-        .map((obj) => {
+        .map((value) => {
           const criterionData = {
-            cat: obj.Cat,
-            criterion: obj.Criterion,
-            comments: obj[country],
-            score: obj[`${country}_score`],
+            cat: value[0],
+            criterion: value[1],
+            comments: value[countryIndex],
+            score: value[countryIndex + 1],
           };
           return criterionData;
         });
       accordionData.total = parseInt(
-        this.findDataPerKey(arr, parseInt(filterValue), `${country}_score`)
+        this.findDataPerKey(arr, parseInt(filterValue), countryIndex + 1)
       );
       accordionData.points = parseInt(
-        this.findDataPerKey(arr, parseInt(filterValue), "points")
+        this.findDataPerKey(arr, parseInt(filterValue), 3)
       );
       accordionData.comments = this.findDataPerKey(
         arr,
         parseInt(filterValue),
-        "Comments"
+        2
       );
 
       if (isNaN(accordionData.total)) return;
