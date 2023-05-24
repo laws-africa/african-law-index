@@ -342,7 +342,7 @@ const africanLawIndex = Vue.createApp({
   methods: {
     async fetchLawIndex() {
       const response = await fetch(
-        "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgqwpUPf25oEk6nge9wjiE8j8hNz1YNSq8xjdJT-soQkG4cfdy0eDpYcI-VFjk5Q1TkYk0UiUtEIdu/pub?gid=619601361&single=true&output=csv"
+        "https://docs.google.com/spreadsheets/d/e/2PACX-1vToqs8Oyz-t2FyHSHAmoqBvFiaR90j2L0XRysS_Wc7IaK6ZVdEhWRDo_jFJNdLqS-1W-OS00UxmLsCg/pub?gid=619601361&single=true&output=csv"
       );
 
       this.status = response.ok;
