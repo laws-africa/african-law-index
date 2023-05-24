@@ -348,8 +348,7 @@ const africanLawIndex = Vue.createApp({
       this.status = response.ok;
 
       if (response.ok) {
-        const responseText = await response.text();
-        const parsedData = Papa.parse(responseText);
+        const parsedData = Papa.parse(await response.text());
         this.lawIndex = this.formatLawIndex(parsedData.data);
         this.updateSortValue("rank");
         this.loading = false;
@@ -358,35 +357,21 @@ const africanLawIndex = Vue.createApp({
         console.log("HTTP-Error: " + response.status);
       }
     },
-    convertToJson(str) {
-      const data = str
-        .split("\r\n")
-        .map((i) => i.replace(/\"/g, "").split(/,(?=\S)/));
-      const keys = data.shift();
-      return data.map((value) => {
-        const keyValuePair = {};
-        keys.map((key, i) => {
-          const validKey = key || `${keys[[i - 1]]}_score`;
-          return (keyValuePair[validKey] = value[i]);
-        });
-        return keyValuePair;
-      });
-    },
     findDataPerKey(arr, value, key) {
-      // This finds the relevant data per key in the json ouput.
+      // This finds the relevant data per key in the parsedData ouput.
       // It takes in an integer or string value of the category, e.g., 1 or "1.2".
-      // If the key exists in the json output, it reurns the property value
+      // If the key exists in the parsedData output, it returns the property value
       // and if not, it returns an empty string.
 
       const foundArr = arr.find((obj) => obj[0] === String(value));
       return foundArr[key] || "";
     },
     formatLawIndex(arr) {
-      // We need to format our json output so that it's readable and more structured.
+      // We need to format our parsedData output so that it's readable and more structured.
       // This helps us populate the table easily.
 
-      // The goal is to sort json output per country
-      // so that each array element contains all relvant info about the specified country.
+      // The goal is to sort parsedData output per country
+      // so that each array element contains all relevant info about the specified country.
 
       const countries = arr[0].filter(
         (key) =>
@@ -394,8 +379,7 @@ const africanLawIndex = Vue.createApp({
           key !== "Cat" &&
           key !== "Criterion" &&
           key !== "Comments" &&
-          key !== "points" &&
-          !key.includes("score")
+          key !== "points"
       );
 
       const unsortedLawIndex = [];
